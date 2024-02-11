@@ -26,6 +26,14 @@ public static class RegistrarExtensions
         }
     }
 
+    /// <summary>
+    /// Get all classes that implement interface T
+    /// Create an instance of each class
+    /// Cast each instance to interface T
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="scanningType"></param>
+    /// <returns></returns> <summary>
     private static IEnumerable<T> GetRegistrars<T>(Type scanningType) where T : IRegistrar
     {
         return scanningType.Assembly.GetTypes()
