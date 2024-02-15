@@ -1,4 +1,6 @@
+using CwkSocial.Api.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Versioning;
 
 namespace CwkSocial.Api.Registrars;
@@ -7,7 +9,10 @@ public class MvcRegistrar : IWebApplicationBuilderRegistrar
 {
     public void RegisterServices(WebApplicationBuilder builder)
     {
-        builder.Services.AddControllers();
+        builder.Services.AddControllers(options =>
+        {
+            options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
+        });
 
         builder.Services.AddApiVersioning(config =>
         {

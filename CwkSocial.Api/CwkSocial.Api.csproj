@@ -7,6 +7,8 @@
     <InvariantGlobalization>false</InvariantGlobalization>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="MediatR" Version="12.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.1">
@@ -19,5 +21,9 @@
     <ProjectReference Include="../CwkSocial.Domain/CwkSocial.Domain.csproj" />
     <ProjectReference Include="../CwkSocial.Application/CwkSocial.Application.csproj" />
     <ProjectReference Include="..\CwkSocial.DataAccess\CwkSocial.DataAccess.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Contracts\Post\Responses\" />
+    <Folder Include="Contracts\Post\Requests\" />
   </ItemGroup>
 </Project>
