@@ -1,18 +1,19 @@
 using AutoMapper;
+using CwkSocial.Api.Contracts.Common;
 using CwkSocial.Api.Contracts.UserProfile.Requests;
 using CwkSocial.Api.Contracts.UserProfile.Responses;
 using CwkSocial.Application.UserProfiles.Commands;
 using CwkSocial.Application.UserProfiles.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Net;
 
 namespace CwkSocial.Api.Controllers.V1;
 
 [ApiVersion("1.0")]
 [Route(ApiRoutes.BaseRoute)]
 [ApiController]
-public class UserProfilesController : ControllerBase
+public class UserProfilesController : ApiController
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
@@ -48,7 +49,7 @@ public class UserProfilesController : ControllerBase
         var response = _mapper.Map<UserProfileResponse>(result);
 
         return CreatedAtAction(
-            nameof(GetUserProfileById), 
+            nameof(GetUserProfileById),
             new { id = response.UserProfileId }, response
         );
     }
@@ -66,7 +67,7 @@ public class UserProfilesController : ControllerBase
 
         if (result is null)
         {
-            return NotFound();
+            return NotFound($"No User with profile ID {id} found");
         }
 
         var response = _mapper.Map<UserProfileResponse>(result);
@@ -82,9 +83,9 @@ public class UserProfilesController : ControllerBase
 
         command.UserProfileId = Guid.Parse(id);
 
-        await _mediator.Send(command);
+        var result = await _mediator.Send(command);
 
-        return NoContent();
+        return result.IsError ? HandleErrorResponse(result.Errors) : NoContent();
     }
 
     [HttpDelete]

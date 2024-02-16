@@ -16,6 +16,6 @@ internal class GetUserProfileByIdHandler : IRequestHandler<GetUserProfileById, U
 
     public async Task<UserProfile?> Handle(GetUserProfileById request, CancellationToken cancellationToken)
     {
-       return await _context.UserProfiles.FindAsync(request.UserProfileId, cancellationToken);
+        return await _context.UserProfiles.FindAsync(request.UserProfileId, cancellationToken);
     }
 }

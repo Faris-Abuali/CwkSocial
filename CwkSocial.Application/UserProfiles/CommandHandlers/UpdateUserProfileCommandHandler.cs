@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
+using CwkSocial.Application.Enums;
+using CwkSocial.Application.Models;
 using CwkSocial.Application.UserProfiles.Commands;
 using CwkSocial.DataAccess;
 using CwkSocial.Domain.Aggregates.UserProfileAggregate;
 using MediatR;
+using System.Net;
 
 namespace CwkSocial.Application.UserProfiles.CommandHandlers;
 
-internal class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfileCommand, Unit>
+internal class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfileCommand, OperationResult<UserProfile>>
 {
     private readonly DataContext _context;
 
@@ -15,33 +18,49 @@ internal class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfi
         _context = context;
     }
 
-    public async Task<Unit> Handle(UpdateUserProfileCommand request, CancellationToken cancellationToken)
+    public async Task<OperationResult<UserProfile>> Handle(UpdateUserProfileCommand request, CancellationToken cancellationToken)
     {
-        // Check if the user profile exists
-        var userProfile = await _context.UserProfiles.FindAsync(request.UserProfileId);
+        var result = new OperationResult<UserProfile>();
 
-        if (userProfile is null)
+        try
         {
-            return new Unit();
+            // Check if the user profile exists
+            var userProfile = await _context.UserProfiles.FindAsync(request.UserProfileId);
+
+            if (userProfile is null)
+            {
+                result.IsError = true;
+                var error = new Error { Code = HttpStatusCode.NotFound, Message = $"No User profile found with ID: {request.UserProfileId}" };
+                result.Errors.Add(error);
+                return result;
+            }
+
+            // Create a new basic info object with the updated information
+            var basicInfo = BasicInfo.Create(
+                    request.FirstName,
+                    request.LastName,
+                    request.EmailAddress,
+                    request.Phone,
+                    request.DateOfBirth,
+                    request.CurrentCity
+            );
+
+            // Update the user profile with the new information
+            userProfile.UpdateBasicInfo(basicInfo);
+
+            _context.UserProfiles.Update(userProfile);
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            result.Payload = userProfile;
+            //return result;
+        }
+        catch (Exception ex)
+        {
+            result.IsError = true;
+            result.Errors.Add(new Error { Message = ex.Message, Code = HttpStatusCode.InternalServerError });
         }
 
-        // Create a new basic info object with the updated information
-        var basicInfo = BasicInfo.Create(
-                request.FirstName,
-                request.LastName,
-                request.EmailAddress,
-                request.Phone,
-                request.DateOfBirth,
-                request.CurrentCity
-        );
-
-        // Update the user profile with the new information
-        userProfile.UpdateBasicInfo(basicInfo);
-
-        _context.UserProfiles.Update(userProfile);
-
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return new Unit(); // Represents a void type, since System.Void is not a valid return type in 
+        return result;
     }
 }
