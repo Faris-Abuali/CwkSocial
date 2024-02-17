@@ -7,16 +7,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CwkSocial.Application.UserProfiles.QueryHandlers;
 
-internal class GetAllUserProfilesHandler : IRequestHandler<GetAllUserProfiles, OperationResult<IEnumerable<UserProfile>>>
+internal class GetAllUserProfilesQueryHandler : IRequestHandler<GetAllUserProfilesQuery, OperationResult<IEnumerable<UserProfile>>>
 {
     private readonly DataContext _context;
 
-    public GetAllUserProfilesHandler(DataContext context)
+    public GetAllUserProfilesQueryHandler(DataContext context)
     {
         _context = context;
     }
 
-    public async Task<OperationResult<IEnumerable<UserProfile>>> Handle(GetAllUserProfiles request, CancellationToken cancellationToken)
+    public async Task<OperationResult<IEnumerable<UserProfile>>> Handle(GetAllUserProfilesQuery request, CancellationToken cancellationToken)
     {
         var userProfiles = await _context.UserProfiles.ToListAsync(cancellationToken);
 

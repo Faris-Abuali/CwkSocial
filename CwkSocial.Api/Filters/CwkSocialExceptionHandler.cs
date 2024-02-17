@@ -9,7 +9,8 @@ public class CwkSocialExceptionHandler : ExceptionFilterAttribute
 {
     public override void OnException(ExceptionContext context)
     {
-        //base.OnException(context);
+        base.OnException(context);
+
         var response = new ErrorResponse
         {
             Phrase = "Internal Server Error",

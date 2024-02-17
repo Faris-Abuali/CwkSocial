@@ -7,16 +7,16 @@ using System.Net;
 
 namespace CwkSocial.Application.UserProfiles.QueryHandlers;
 
-internal class GetUserProfileByIdHandler : IRequestHandler<GetUserProfileById, OperationResult<UserProfile?>>
+internal class GetUserProfileByIdQueryHandler : IRequestHandler<GetUserProfileByIdQuery, OperationResult<UserProfile?>>
 {
     private readonly DataContext _context;
 
-    public GetUserProfileByIdHandler(DataContext context)
+    public GetUserProfileByIdQueryHandler(DataContext context)
     {
         _context = context;
     }
 
-    public async Task<OperationResult<UserProfile?>> Handle(GetUserProfileById request, CancellationToken cancellationToken)
+    public async Task<OperationResult<UserProfile?>> Handle(GetUserProfileByIdQuery request, CancellationToken cancellationToken)
     {
         var result = new OperationResult<UserProfile?>();
 

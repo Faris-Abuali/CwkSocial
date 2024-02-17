@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using CwkSocial.Application.Models;
+﻿using CwkSocial.Application.Models;
 using CwkSocial.Application.UserProfiles.Commands;
 using CwkSocial.DataAccess;
 using CwkSocial.Domain.Aggregates.UserProfileAggregate;
@@ -42,8 +41,6 @@ internal class CreateUserProfileCommandHandler : IRequestHandler<CreateUserProfi
             await _context.SaveChangesAsync(cancellationToken);
 
             result.Payload = userProfile;
-
-            return result;
         }
         catch (UserProfileNotValidException ex)
         {
@@ -55,20 +52,13 @@ internal class CreateUserProfileCommandHandler : IRequestHandler<CreateUserProfi
                     Code = HttpStatusCode.BadRequest,
                     Message = err,
                 });
-
-            return result;
         }
         catch (Exception ex)
         {
             result.IsError = true;
-
-            result.Errors.Add(new Error
-            {
-                Code = HttpStatusCode.InternalServerError,
-                Message = ex.Message,
-            });
-
-            return result;
+            result.Errors = [new Error { Message = ex.Message }];
         }
+
+        return result;
     }
 }

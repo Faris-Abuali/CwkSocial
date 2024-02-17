@@ -22,8 +22,4 @@
     <ProjectReference Include="../CwkSocial.Application/CwkSocial.Application.csproj" />
     <ProjectReference Include="..\CwkSocial.DataAccess\CwkSocial.DataAccess.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Contracts\Post\Responses\" />
-    <Folder Include="Contracts\Post\Requests\" />
-  </ItemGroup>
 </Project>

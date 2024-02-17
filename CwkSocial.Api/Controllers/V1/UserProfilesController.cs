@@ -16,10 +16,10 @@ namespace CwkSocial.Api.Controllers.V1;
 [ApiController]
 public class UserProfilesController : ApiController
 {
-    private readonly IMediator _mediator;
+    private readonly ISender _mediator;
     private readonly IMapper _mapper;
 
-    public UserProfilesController(IMediator mediator, IMapper mapper)
+    public UserProfilesController(ISender mediator, IMapper mapper)
     {
         _mediator = mediator;
         _mapper = mapper;
@@ -28,7 +28,7 @@ public class UserProfilesController : ApiController
     [HttpGet]
     public async Task<IActionResult> GetAllProfiles()
     {
-        var query = new GetAllUserProfiles();
+        var query = new GetAllUserProfilesQuery();
 
         var result = await _mediator.Send(query);
 
@@ -63,7 +63,7 @@ public class UserProfilesController : ApiController
     [ValidateGuid("id")]
     public async Task<IActionResult> GetUserProfileById(string id)
     {
-        var query = new GetUserProfileById
+        var query = new GetUserProfileByIdQuery
         {
             UserProfileId = Guid.Parse(id)
         };

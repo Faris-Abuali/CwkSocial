@@ -12,7 +12,8 @@ public class PostComment
 
     public Guid UserProfileId { get; private set; } // Foreign key to UserProfile
 
-    // Marking Text as non-nullable and ensuring it's initialized to a non-null value.
+    public UserProfile? UserProfile { get; private set; } // Navigation property for EF Core
+
     public string Text { get; private set; } = string.Empty;
 
     public DateTime CreatedDate { get; private set; }
@@ -22,6 +23,15 @@ public class PostComment
     private PostComment() { }
 
     // Factory methods
+
+    /// <summary>
+    /// Creates a new comment for a post
+    /// </summary>
+    /// <param name="postId"></param>
+    /// <param name="userProfileId"></param>
+    /// <param name="text"></param>
+    /// <returns>The newly created comment</returns>
+    /// <exception cref="PostCommentNotValidException"></exception>
     public static PostComment Create(Guid postId, Guid userProfileId, string text)
     {
         var validator = new PostCommentValidator();

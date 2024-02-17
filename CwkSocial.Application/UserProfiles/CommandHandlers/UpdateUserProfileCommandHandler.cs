@@ -71,7 +71,7 @@ internal class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfi
         catch (Exception ex)
         {
             result.IsError = true;
-            result.Errors.Add(new Error { Message = ex.Message, Code = HttpStatusCode.InternalServerError });
+            result.Errors = [new Error { Message = ex.Message }];
         }
 
         return result;

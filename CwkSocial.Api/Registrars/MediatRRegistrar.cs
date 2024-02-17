@@ -13,13 +13,13 @@ public class MediatRRegistrar : IWebApplicationBuilderRegistrar
          * 1. Scan the assembly where Porgram class exists (Api layer)
          * 2. Scan the assembly for any class from the (Application layer) (e.g. GetAllUserProfiles)
         */
-        builder.Services.AddAutoMapper(typeof(Program), typeof(GetAllUserProfiles));
+        builder.Services.AddAutoMapper(typeof(Program), typeof(GetAllUserProfilesQuery));
 
         // Add MediatR
         builder.Services.AddMediatR(cfg =>
         {
             // Alternatively, register handlers from a specific assembly:
-            cfg.RegisterServicesFromAssembly(typeof(GetAllUserProfiles).Assembly);
+            cfg.RegisterServicesFromAssembly(typeof(GetAllUserProfilesQuery).Assembly);
         });
     }
 }

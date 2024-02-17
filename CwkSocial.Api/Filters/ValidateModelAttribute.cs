@@ -7,13 +7,18 @@ namespace CwkSocial.Api.Filters;
 
 public class ValidateModelAttribute : ActionFilterAttribute
 {
+
+    /// <summary>
+    /// This method is called before the action method is invoked.
+    /// It checks if the model state is valid and if not, it returns a BadRequest response.
+    /// </summary>
+    /// <param name="context"></param>
     public override void OnResultExecuting(ResultExecutingContext context)
     {
         if (!context.ModelState.IsValid)
         {
             var errors = new List<string>(); // Initialize an empty list
 
-            Console.WriteLine(context.ModelState);
             foreach (var modelStateEntry in context.ModelState)
             {
                 foreach (var error in modelStateEntry.Value.Errors)
@@ -30,8 +35,10 @@ public class ValidateModelAttribute : ActionFilterAttribute
                 Errors = errors
             };
 
-            // TODO: Make sure Asp.Net Core doesn't override our action result body
-            context.Result = new JsonResult(response);
+            context.Result = new JsonResult(response)
+            {
+                StatusCode = (int)HttpStatusCode.BadRequest
+            };
         }
     }
 }

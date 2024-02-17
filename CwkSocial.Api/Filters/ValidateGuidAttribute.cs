@@ -29,6 +29,9 @@ public class ValidateGuidAttribute : ActionFilterAttribute
             Errors = [$"The parameter {_key} is not a valid GUID format: {value}"]
         };
 
-        context.Result = new JsonResult(response);
+        context.Result = new JsonResult(response)
+        {
+            StatusCode = (int)HttpStatusCode.BadRequest
+        };
     }
 }

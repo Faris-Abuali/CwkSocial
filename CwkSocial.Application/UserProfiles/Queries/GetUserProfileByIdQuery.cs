@@ -4,7 +4,7 @@ using MediatR;
 
 namespace CwkSocial.Application.UserProfiles.Queries;
 
-public class GetAllUserProfiles : IRequest<OperationResult<IEnumerable<UserProfile>>>
+public class GetUserProfileByIdQuery : IRequest<OperationResult<UserProfile?>>
 {
-    // TODO: Add properties for filtering, pagination, etc.
+    public Guid UserProfileId { get; init; }
 }
