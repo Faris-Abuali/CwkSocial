@@ -1,9 +1,10 @@
 ﻿using MediatR;
 using CwkSocial.Domain.Aggregates.UserProfileAggregate;
+using CwkSocial.Application.Models;
 
 namespace CwkSocial.Application.UserProfiles.Commands;
 
-public class CreateUserProfileCommand : IRequest<UserProfile>
+public class CreateUserProfileCommand : IRequest<OperationResult<UserProfile>>
 {
     public string FirstName { get; init; } = string.Empty;
 

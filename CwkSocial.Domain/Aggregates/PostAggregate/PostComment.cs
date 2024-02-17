@@ -1,3 +1,7 @@
+using CwkSocial.Domain.Aggregates.UserProfileAggregate;
+using CwkSocial.Domain.Exceptions;
+using CwkSocial.Domain.Validators.PostsValidators;
+
 namespace CwkSocial.Domain.Aggregates.PostAggregate;
 
 public class PostComment
@@ -20,9 +24,9 @@ public class PostComment
     // Factory methods
     public static PostComment Create(Guid postId, Guid userProfileId, string text)
     {
-        // TODO: Add validation, error handling strategies, error notifications.
+        var validator = new PostCommentValidator();
 
-        return new PostComment
+        var postComment = new PostComment
         {
             PostId = postId,
             UserProfileId = userProfileId,
@@ -31,6 +35,17 @@ public class PostComment
             CreatedDate = DateTime.UtcNow,
             LastModified = DateTime.UtcNow
         };
+
+        var validationResult = validator.Validate(postComment);
+
+        if (validationResult.IsValid) return postComment;
+
+        var exception = new PostCommentNotValidException("Post comment is invalid")
+        {
+            ValidationErrors = validationResult.Errors.ConvertAll(e => e.ErrorMessage)
+        };
+
+        throw exception;
     }
 
     // public methods

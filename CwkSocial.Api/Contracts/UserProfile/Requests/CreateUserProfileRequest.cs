@@ -1,16 +1,27 @@
-﻿namespace CwkSocial.Api.Contracts.UserProfile.Requests;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CwkSocial.Api.Contracts.UserProfile.Requests;
 
 public record CreateUserProfileRequest
 {
-    public string FirstName { get; init; } = string.Empty;
+    [Required]
+    [MinLength(3)]
+    [MaxLength(50)]
+    public required string FirstName { get; init; }
 
-    public string LastName { get; init; } = string.Empty;
+    [Required]
+    [MinLength(3)]
+    [MaxLength(50)]
+    public required string LastName { get; init; }
 
+    [Required]
+    [EmailAddress]
     public string EmailAddress { get; init; } = string.Empty;
 
     public string? Phone { get; init; }
 
-    public DateTime DateOfBirth { get; init; }
+    [Required]
+    public required DateTime DateOfBirth { get; init; }
 
     public string? CurrentCity { get; init; }
 }

@@ -1,3 +1,6 @@
+using CwkSocial.Domain.Exceptions;
+using CwkSocial.Domain.Validators.UserProfileValidators;
+
 namespace CwkSocial.Domain.Aggregates.UserProfileAggregate;
 
 public class BasicInfo
@@ -27,9 +30,9 @@ public class BasicInfo
         DateTime dateOfBirth,
         string currentCity)
     {
-        // TODO: Add validation, error handling strategies, error notifications.
+        var validator = new BasicInfoValidator();
 
-        return new BasicInfo
+        var basicInfo = new BasicInfo
         {
             FirstName = firstName,
             LastName = lastName,
@@ -38,6 +41,17 @@ public class BasicInfo
             DateOfBirth = dateOfBirth,
             CurrentCity = currentCity
         };
+
+        var validationResult = validator.Validate(basicInfo);
+
+        if (validationResult.IsValid) return basicInfo;
+
+        var exception = new UserProfileNotValidException("The basic info is not valid.")
+        {
+            ValidationErrors = validationResult.Errors.ConvertAll(e => e.ErrorMessage)
+        };
+
+        throw exception;
     }
 
     // Note: We don't have any public methods to update the basic info.

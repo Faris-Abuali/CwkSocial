@@ -4,6 +4,7 @@ using CwkSocial.Application.Models;
 using CwkSocial.Application.UserProfiles.Commands;
 using CwkSocial.DataAccess;
 using CwkSocial.Domain.Aggregates.UserProfileAggregate;
+using CwkSocial.Domain.Exceptions;
 using MediatR;
 using System.Net;
 
@@ -53,7 +54,19 @@ internal class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfi
             await _context.SaveChangesAsync(cancellationToken);
 
             result.Payload = userProfile;
-            //return result;
+        }
+        catch (UserProfileNotValidException ex)
+        {
+            result.IsError = true;
+
+            result.Errors = ex.ValidationErrors
+                .ConvertAll(err => new Error
+                {
+                    Code = HttpStatusCode.BadRequest,
+                    Message = err,
+                });
+
+            return result;
         }
         catch (Exception ex)
         {

@@ -2,6 +2,7 @@ using AutoMapper;
 using CwkSocial.Api.Contracts.Common;
 using CwkSocial.Api.Contracts.UserProfile.Requests;
 using CwkSocial.Api.Contracts.UserProfile.Responses;
+using CwkSocial.Api.Filters;
 using CwkSocial.Application.UserProfiles.Commands;
 using CwkSocial.Application.UserProfiles.Queries;
 using MediatR;
@@ -31,7 +32,7 @@ public class UserProfilesController : ApiController
 
         var result = await _mediator.Send(query);
 
-        var response = _mapper.Map<List<UserProfileResponse>>(result);
+        var response = _mapper.Map<List<UserProfileResponse>>(result.Payload);
 
         return Ok(response);
     }
@@ -45,8 +46,10 @@ public class UserProfilesController : ApiController
         // Send the command to the mediator
         var result = await _mediator.Send(command);
 
+        if (result.IsError) return HandleErrorResponse(result.Errors);
+
         // Map the result from the Domain to the Contract
-        var response = _mapper.Map<UserProfileResponse>(result);
+        var response = _mapper.Map<UserProfileResponse>(result.Payload);
 
         return CreatedAtAction(
             nameof(GetUserProfileById),
@@ -56,6 +59,8 @@ public class UserProfilesController : ApiController
 
     [HttpGet]
     [Route(ApiRoutes.UserProfiles.IdRoute)]
+    [ValidateModel]
+    [ValidateGuid("id")]
     public async Task<IActionResult> GetUserProfileById(string id)
     {
         var query = new GetUserProfileById
@@ -65,18 +70,17 @@ public class UserProfilesController : ApiController
 
         var result = await _mediator.Send(query);
 
-        if (result is null)
-        {
-            return NotFound($"No User with profile ID {id} found");
-        }
+        if (result.IsError) return HandleErrorResponse(result.Errors);
 
-        var response = _mapper.Map<UserProfileResponse>(result);
+        var response = _mapper.Map<UserProfileResponse>(result.Payload);
 
         return Ok(response);
     }
 
     [HttpPatch]
     [Route(ApiRoutes.UserProfiles.IdRoute)]
+    [ValidateModel]
+    [ValidateGuid("id")]
     public async Task<IActionResult> UpdateUserProfile(string id, CreateUserProfileRequest updatedProfile)
     {
         var command = _mapper.Map<UpdateUserProfileCommand>(updatedProfile);
@@ -90,6 +94,7 @@ public class UserProfilesController : ApiController
 
     [HttpDelete]
     [Route(ApiRoutes.UserProfiles.IdRoute)]
+    [ValidateGuid("id")]
     public async Task<IActionResult> DeleteUserProfile(string id)
     {
         var command = new DeleteUserProfileCommand
@@ -97,8 +102,8 @@ public class UserProfilesController : ApiController
             UserProfileId = Guid.Parse(id)
         };
 
-        await _mediator.Send(command);
+        var result = await _mediator.Send(command);
 
-        return NoContent();
+        return result.IsError ? HandleErrorResponse(result.Errors) : NoContent();
     }
 }

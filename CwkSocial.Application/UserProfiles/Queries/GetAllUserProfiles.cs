@@ -1,9 +1,10 @@
-﻿using CwkSocial.Domain.Aggregates.UserProfileAggregate;
+﻿using CwkSocial.Application.Models;
+using CwkSocial.Domain.Aggregates.UserProfileAggregate;
 using MediatR;
 
 namespace CwkSocial.Application.UserProfiles.Queries;
 
-public class GetAllUserProfiles : IRequest<IEnumerable<UserProfile>>
+public class GetAllUserProfiles : IRequest<OperationResult<IEnumerable<UserProfile>>>
 {
     // TODO: Add properties for filtering, pagination, etc.
 }

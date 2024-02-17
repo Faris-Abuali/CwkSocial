@@ -9,34 +9,33 @@ public class ApiController : ControllerBase
 {
     protected IActionResult HandleErrorResponse(List<Error> errors)
     {
-        Error? firstError;
+        var firstError = errors.First();
 
-        if (errors.Any(e => e.Code == HttpStatusCode.NotFound))
+        if (firstError is null)
         {
-            firstError = errors.FirstOrDefault(e => e.Code == HttpStatusCode.NotFound);
-
-            return NotFound(new ErrorResponse
-            {
-                Phrase = "Not Found",
-                Code = (int)HttpStatusCode.NotFound,
-                Timestamp = DateTime.UtcNow,
-                Errors = firstError is null ? [] : [firstError.Message]
-            });
-        }
-
-        //if (errors.Any(e => e.Code == HttpStatusCode.InternalServerError))
-        //{
-        firstError = errors.FirstOrDefault(e => e.Code == HttpStatusCode.InternalServerError);
-
-        return StatusCode(
+            return StatusCode(
             (int)HttpStatusCode.InternalServerError,
             new ErrorResponse
             {
                 Phrase = "Internal Server Error",
                 Code = (int)HttpStatusCode.InternalServerError,
                 Timestamp = DateTime.UtcNow,
-                Errors = firstError is null ? [] : [firstError.Message]
+                Errors = []
             });
-        //}
+
+        }
+
+        var response = new ErrorResponse
+        {
+            Phrase = "Bad Request",
+            Code = (int)firstError.Code,
+            Timestamp = DateTime.UtcNow,
+            Errors = errors.ConvertAll(err => err.Message)
+        };
+
+        return new JsonResult(response)
+        {
+            StatusCode = (int)firstError.Code
+        };
     }
 }

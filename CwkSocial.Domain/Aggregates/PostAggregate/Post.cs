@@ -1,4 +1,6 @@
 using CwkSocial.Domain.Aggregates.UserProfileAggregate;
+using CwkSocial.Domain.Exceptions;
+using CwkSocial.Domain.Validators.PostsValidators;
 
 namespace CwkSocial.Domain.Aggregates.PostAggregate;
 
@@ -32,9 +34,9 @@ public class Post
     // Factory methods
     public static Post Create(Guid userProfileId, string textContent)
     {
-        // TODO: Add validation, error handling strategies, error notifications.
+        var validator = new PostValidator();
 
-        return new Post
+        var post = new Post
         {
             UserProfileId = userProfileId,
             TextContent = textContent,
@@ -42,15 +44,39 @@ public class Post
             CreatedDate = DateTime.UtcNow,
             LastModified = DateTime.UtcNow
         };
+
+        var validationResult = validator.Validate(post);
+
+        if (validationResult.IsValid) return post;
+
+        var exception = new UserProfileNotValidException("Post is not valid")
+        {
+            ValidationErrors = validationResult.Errors.ConvertAll(e => e.ErrorMessage)
+        };
+
+        throw exception;
     }
 
     // public methods
     public void UpdatePostText(string textContent)
     {
+        if (string.IsNullOrWhiteSpace(textContent))
+        {
+            var exception = new PostNotValidException("Cannot update post. Post text cannot be empty")
+            {
+                ValidationErrors = ["Post text cannot be empty"]
+            };
+
+            throw exception;
+        }
+
         TextContent = textContent;
         LastModified = DateTime.UtcNow;
     }
 
+    // Note: Since we already validated the PostComment.Create method,
+    // and since it is the only method that can create a PostComment,
+    // we don't need to validate the PostComment object here.
     public void AddComment(PostComment comment)
     {
         _comments.Add(comment);
