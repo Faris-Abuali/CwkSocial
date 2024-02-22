@@ -1,4 +1,5 @@
 ﻿using CwkSocial.DataAccess;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace CwkSocial.Api.Registrars;
@@ -13,6 +14,17 @@ public class DbRegistrar : IWebApplicationBuilderRegistrar
         {
             options.UseSqlServer(connectionString);
         });
+
+        builder.Services.AddIdentityCore<IdentityUser>(options =>
+        {
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireUppercase = true;
+            //options.Password.RequireNonAlphanumeric = true;
+            //options.Password.RequiredLength = 8;
+            options.User.RequireUniqueEmail = true;
+        })
+            .AddEntityFrameworkStores<DataContext>();
     }
 }
 

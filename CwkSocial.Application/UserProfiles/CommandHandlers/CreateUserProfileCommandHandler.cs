@@ -44,8 +44,6 @@ internal class CreateUserProfileCommandHandler : IRequestHandler<CreateUserProfi
         }
         catch (UserProfileNotValidException ex)
         {
-            result.IsError = true;
-
             result.Errors = ex.ValidationErrors
                 .ConvertAll(err => new Error
                 {

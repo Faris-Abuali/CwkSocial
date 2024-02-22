@@ -1,19 +1,19 @@
 using AutoMapper;
-using CwkSocial.Api.Contracts.Common;
 using CwkSocial.Api.Contracts.UserProfile.Requests;
 using CwkSocial.Api.Contracts.UserProfile.Responses;
 using CwkSocial.Api.Filters;
 using CwkSocial.Application.UserProfiles.Commands;
 using CwkSocial.Application.UserProfiles.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace CwkSocial.Api.Controllers.V1;
 
 [ApiVersion("1.0")]
 [Route(ApiRoutes.BaseRoute)]
 [ApiController]
+[Authorize()]
 public class UserProfilesController : ApiController
 {
     private readonly ISender _mediator;
@@ -37,25 +37,25 @@ public class UserProfilesController : ApiController
         return Ok(response);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateUserProfile([FromBody] CreateUserProfileRequest profile)
-    {
-        // Map CreateUserProfileRequest to CreateUserProfileCommand
-        var command = _mapper.Map<CreateUserProfileCommand>(profile);
+    //[HttpPost]
+    //public async Task<IActionResult> CreateUserProfile([FromBody] CreateUserProfileRequest profile)
+    //{
+    //    // Map CreateUserProfileRequest to CreateUserProfileCommand
+    //    var command = _mapper.Map<CreateUserProfileCommand>(profile);
 
-        // Send the command to the mediator
-        var result = await _mediator.Send(command);
+    //    // Send the command to the mediator
+    //    var result = await _mediator.Send(command);
 
-        if (result.IsError) return HandleErrorResponse(result.Errors);
+    //    if (result.IsError) return HandleErrorResponse(result.Errors);
 
-        // Map the result from the Domain to the Contract
-        var response = _mapper.Map<UserProfileResponse>(result.Payload);
+    //    // Map the result from the Domain to the Contract
+    //    var response = _mapper.Map<UserProfileResponse>(result.Payload);
 
-        return CreatedAtAction(
-            nameof(GetUserProfileById),
-            new { id = response.UserProfileId }, response
-        );
-    }
+    //    return CreatedAtAction(
+    //        nameof(GetUserProfileById),
+    //        new { id = response.UserProfileId }, response
+    //    );
+    //}
 
     [HttpGet]
     [Route(ApiRoutes.UserProfiles.IdRoute)]

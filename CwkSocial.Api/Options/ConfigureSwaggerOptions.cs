@@ -21,6 +21,15 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
         {
             options.SwaggerDoc(description.GroupName, CreateVersionInfo(description));
         }
+
+        var securityScheme = GetJwtSecurityScheme();
+
+        // Add a security definition, describing how your API is protected, to the generated Swagger:
+        options.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            { securityScheme, Array.Empty<string>() }
+        });
     }
 
     private OpenApiInfo CreateVersionInfo(ApiVersionDescription description)
@@ -38,4 +47,23 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
 
         return info;
     }
+
+    private OpenApiSecurityScheme GetJwtSecurityScheme()
+    {
+        return new OpenApiSecurityScheme
+        {
+            Name = "JWT Authentication",
+            Description = "Provide a JWT Bearer",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            Reference = new OpenApiReference
+            {
+                Id = JwtBearerDefaults.AuthenticationScheme,
+                Type = ReferenceType.SecurityScheme
+            }
+        };
+    }
 }
+

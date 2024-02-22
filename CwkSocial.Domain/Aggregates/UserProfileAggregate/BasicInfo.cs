@@ -11,24 +11,36 @@ public class BasicInfo
 
     public string EmailAddress { get; private set; } = string.Empty;
 
-    public string? Phone { get; private set; }
+    public string? Phone { get; private set; } = string.Empty;
 
     public DateTime DateOfBirth { get; private set; }
 
-    public string? CurrentCity { get; private set; }
+    public string? CurrentCity { get; private set; } = string.Empty;
 
     private BasicInfo()
     {
 
     }
 
+    /// <summary>
+    /// Creates a new instance of the BasicInfo class, which is
+    /// a part of the UserProfile aggregate.
+    /// </summary>
+    /// <param name="firstName"></param>
+    /// <param name="lastName"></param>
+    /// <param name="emailAddress"></param>
+    /// <param name="phone"></param>
+    /// <param name="dateOfBirth"></param>
+    /// <param name="currentCity"></param>
+    /// <returns>An instance of BasicInfo</returns>
+    /// <exception cref="UserProfileNotValidException"></exception>
     public static BasicInfo Create(
         string firstName,
         string lastName,
         string emailAddress,
         string? phone,
         DateTime dateOfBirth,
-        string currentCity)
+        string? currentCity)
     {
         var validator = new BasicInfoValidator();
 
