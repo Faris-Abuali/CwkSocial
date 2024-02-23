@@ -53,19 +53,7 @@ internal class RegisterUserCommandHandler
             await transaction.CommitAsync(cancellationToken);
             // -- End of transaction --
 
-            var claimsIdentity = new ClaimsIdentity(new[]
-                {
-                    new Claim(JwtRegisteredClaimNames.Sub, identityUser.UserName!),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Email, identityUser.Email!),
-                    new Claim("IdentityId", identityUser.Id),
-                    new Claim("UserProfileId", userProfile.UserProfileId.ToString()),
-                });
-
-            // Create a JWT token
-            var token = _identityService.CreateSecurityToken(claimsIdentity);
-
-            result.Payload = _identityService.WriteToken(token);
+            result.Payload = GetJwtString(identityUser, userProfile);
         }
         catch (UserProfileNotValidException ex)
         {
@@ -170,5 +158,22 @@ internal class RegisterUserCommandHandler
             await transaction.RollbackAsync(cancellationToken);
             throw;
         }
+    }
+
+    private string GetJwtString(IdentityUser identityUser, UserProfile userProfile)
+    {
+        var claimsIdentity = new ClaimsIdentity(new[]
+              {
+                    new Claim(JwtRegisteredClaimNames.Sub, identityUser.UserName!),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.Email, identityUser.Email!),
+                    new Claim("IdentityId", identityUser.Id),
+                    new Claim("UserProfileId", userProfile.UserProfileId.ToString()),
+                });
+
+        // Create a JWT token
+        var token = _identityService.CreateSecurityToken(claimsIdentity);
+
+        return _identityService.WriteToken(token);
     }
 }

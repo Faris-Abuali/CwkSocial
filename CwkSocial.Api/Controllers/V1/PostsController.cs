@@ -6,13 +6,16 @@ using CwkSocial.Api.Filters;
 using CwkSocial.Application.Posts.Commands;
 using CwkSocial.Application.Posts.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CwkSocial.Api.Controllers.V1;
 
 [ApiVersion("1.0")]
 [Route(ApiRoutes.BaseRoute)]
 [ApiController]
+[Authorize()]
 public class PostsController : ApiController
 {
     private readonly ISender _mediator;
@@ -58,9 +61,12 @@ public class PostsController : ApiController
     [ValidateModel]
     public async Task<IActionResult> CreatePost([FromBody] CreatePostRequest request)
     {
+        // Get the UserProfileId from the token claims
+        var userProfileId = HttpContext.GetUserProfileIdClaimValue();
+
         var command = new CreatePostCommand
         {
-            UserProfileId = request.UserProfileId,
+            UserProfileId = userProfileId,
             TextContent = request.TextContent
         };
 
@@ -82,12 +88,16 @@ public class PostsController : ApiController
     [ValidateGuid("id")]
     public async Task<IActionResult> UpdatePost(string id, [FromBody] UpdatePostRequest request)
     {
+        // Get the UserProfileId from the token claims
+        var userProfileId = HttpContext.GetUserProfileIdClaimValue();
+
         var postId = Guid.Parse(id);
 
         var command = new UpdatePostCommand
         {
             TextContent = request.TextContent,
-            PostId = postId
+            PostId = postId,
+            UserProfileId = userProfileId
         };
 
         var result = await _mediator.Send(command);

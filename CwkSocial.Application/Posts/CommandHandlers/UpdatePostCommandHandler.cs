@@ -40,6 +40,18 @@ internal class UpdatePostCommandHandler
                 return result;
             }
 
+            // Check if the user is the owner of the post
+            if (post.UserProfileId != request.UserProfileId)
+            {
+                var error = new Error
+                {
+                    Code = HttpStatusCode.Forbidden,
+                    Message = "You are not the owner of this post"
+                };
+                result.Errors = [error];
+                return result;
+            }
+
             // Update the post's text content
             post.UpdatePostText(request.TextContent);
 
