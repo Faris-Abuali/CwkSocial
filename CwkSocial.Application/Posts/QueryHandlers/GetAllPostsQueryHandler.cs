@@ -5,6 +5,7 @@ using CwkSocial.DataAccess;
 using CwkSocial.Domain.Aggregates.PostAggregate;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace CwkSocial.Application.Posts.QueryHandlers;
 
@@ -29,8 +30,7 @@ internal class GetAllPostsQueryHandler : IRequestHandler<GetAllPostsQuery, Opera
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            result.Errors = [new Error { Message = ex.Message }];
+            result.AddUnknownError(ex.Message);
         }
 
         return result;

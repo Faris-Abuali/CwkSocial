@@ -44,17 +44,12 @@ internal class CreateUserProfileCommandHandler : IRequestHandler<CreateUserProfi
         }
         catch (UserProfileNotValidException ex)
         {
-            result.Errors = ex.ValidationErrors
-                .ConvertAll(err => new Error
-                {
-                    Code = HttpStatusCode.BadRequest,
-                    Message = err,
-                });
+            ex.ValidationErrors
+                .ForEach(msg => result.AddError(msg));
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            result.Errors = [new Error { Message = ex.Message }];
+            result.AddUnknownError(ex.Message);
         }
 
         return result;

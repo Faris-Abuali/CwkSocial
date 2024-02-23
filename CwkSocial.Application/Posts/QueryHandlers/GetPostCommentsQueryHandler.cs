@@ -30,11 +30,9 @@ internal class GetPostCommentsQueryHandler
 
             if (post is null)
             {
-                result.Errors = [new Error
-                {
-                    Message = $"Post with id {request.PostId} not found",
-                    Code = HttpStatusCode.NotFound
-                }];
+                result.AddError(
+                         string.Format(PostsErrorMessages.PostNotFound, request.PostId),
+                         HttpStatusCode.NotFound);
 
                 return result;
             }
@@ -43,12 +41,7 @@ internal class GetPostCommentsQueryHandler
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            result.Errors = [new Error
-            {
-                Message = ex.Message,
-                Code = HttpStatusCode.InternalServerError
-            }];
+            result.AddUnknownError(ex.Message);
             return result;
         }
 

@@ -37,16 +37,16 @@ internal class RegisterUserCommandHandler
         try
         {
             // Create a new IdentityUser
-            var canRegisterUser = await ValidateIdentityUser(result, request);
+            await ValidateIdentityUser(result, request);
 
-            if (!canRegisterUser) return result;
+            if (result.IsError) return result;
 
             // -- Start a transaction to ensure that the user profile is created only if the user is created successfully --
             using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 
             var identityUser = await CreateIdentityUserAsync(result, request, transaction, cancellationToken);
 
-            if (identityUser is null) return result;
+            if (result.IsError || identityUser is null) return result;
 
             var userProfile = await CreateUserProfileAsync(request, transaction, identityUser, cancellationToken);
 
@@ -57,37 +57,23 @@ internal class RegisterUserCommandHandler
         }
         catch (UserProfileNotValidException ex)
         {
-            result.Errors = ex.ValidationErrors
-              .ConvertAll(err => new Error
-              {
-                  Code = HttpStatusCode.BadRequest,
-                  Message = err,
-              });
+            ex.ValidationErrors
+                .ForEach(msg => { result.AddError(msg); });
         }
         catch (Exception ex)
         {
-            result.Errors = [new Error { Message = ex.Message }];
+            result.AddUnknownError(ex.Message);
         }
 
         return result;
     }
 
-
-    private async Task<bool> ValidateIdentityUser(OperationResult<string> result, RegisterUserCommand request)
+    private async Task ValidateIdentityUser(OperationResult<string> result, RegisterUserCommand request)
     {
         var existingUser = await _userManager.FindByEmailAsync(request.UserName);
 
         if (existingUser is not null)
-        {
-            result.Errors = [new Error
-            {
-                    Message = $"User with user name {request.UserName} already exists with"
-                }];
-
-            return false;
-        }
-
-        return true;
+            result.AddError(IdentityErrorMessages.IdentityUserAlreadyExist);
     }
 
     private async Task<IdentityUser?> CreateIdentityUserAsync(
@@ -111,16 +97,10 @@ internal class RegisterUserCommandHandler
         {
             await transaction.RollbackAsync(cancellationToken);
 
-            result.Errors = createdIdentityUser.Errors
-                .Select(e => new Error
-                {
-                    Message = e.Description,
-                    Code = HttpStatusCode.BadRequest
-                    // TODO: Use ErrorOr unique errors (these are not HTTP errors)
-                })
-                .ToList();
-
-            return null;
+            foreach (var error in createdIdentityUser.Errors)
+            {
+                result.AddError(error.Description, HttpStatusCode.BadRequest);
+            }
         }
 
         return identityUser;

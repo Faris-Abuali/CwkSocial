@@ -30,9 +30,10 @@ internal class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfi
 
             if (userProfile is null)
             {
-                result.IsError = true;
-                var error = new Error { Code = HttpStatusCode.NotFound, Message = $"No User profile found with ID: {request.UserProfileId}" };
-                result.Errors.Add(error);
+                result.AddError(
+                    string.Format(UserProfilesErrorMessages.UserProfileNotFound, request.UserProfileId),
+                    HttpStatusCode.NotFound);
+
                 return result;
             }
 
@@ -57,21 +58,14 @@ internal class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfi
         }
         catch (UserProfileNotValidException ex)
         {
-            result.IsError = true;
-
-            result.Errors = ex.ValidationErrors
-                .ConvertAll(err => new Error
-                {
-                    Code = HttpStatusCode.BadRequest,
-                    Message = err,
-                });
+            ex.ValidationErrors
+                .ForEach(msg => result.AddError(msg));
 
             return result;
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            result.Errors = [new Error { Message = ex.Message }];
+            result.AddUnknownError(ex.Message);
         }
 
         return result;

@@ -30,25 +30,17 @@ internal class UpdatePostCommandHandler
 
             if (post is null)
             {
-                result.IsError = true;
-                var error = new Error
-                {
-                    Code = HttpStatusCode.NotFound,
-                    Message = $"No post found with ID: {request.PostId}"
-                };
-                result.Errors = [error];
+                result.AddError(
+                        string.Format(PostsErrorMessages.PostNotFound, request.PostId),
+                        HttpStatusCode.NotFound);
+
                 return result;
             }
 
             // Check if the user is the owner of the post
             if (post.UserProfileId != request.UserProfileId)
             {
-                var error = new Error
-                {
-                    Code = HttpStatusCode.Forbidden,
-                    Message = "You are not the owner of this post"
-                };
-                result.Errors = [error];
+                result.AddError(PostsErrorMessages.NotPostOwner, HttpStatusCode.Forbidden);
                 return result;
             }
 
@@ -65,19 +57,12 @@ internal class UpdatePostCommandHandler
         }
         catch (PostNotValidException ex)
         {
-            result.IsError = true;
-
-            result.Errors = ex.ValidationErrors
-                .ConvertAll(errMessage => new Error
-                {
-                    Code = HttpStatusCode.BadRequest,
-                    Message = errMessage,
-                });
+            ex.ValidationErrors
+                .ForEach(msg => result.AddError(msg));
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            result.Errors = [new Error { Message = ex.Message }];
+            result.AddUnknownError(ex.Message);
         }
 
         return result;

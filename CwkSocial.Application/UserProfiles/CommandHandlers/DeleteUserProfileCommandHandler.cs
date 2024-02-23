@@ -24,14 +24,9 @@ internal class DeleteUserProfileCommandHandler : IRequestHandler<DeleteUserProfi
 
         if (userProfile is null)
         {
-            result.IsError = true;
-            result.Errors.Add(
-                new Error
-                {
-                    Code = HttpStatusCode.NotFound,
-                    Message = $"No User profile found with ID: {request.UserProfileId}"
-                }
-            );
+            result.AddError(
+                    string.Format(UserProfilesErrorMessages.UserProfileNotFound, request.UserProfileId),
+                    HttpStatusCode.NotFound);
 
             return result;
         }

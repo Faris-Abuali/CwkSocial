@@ -36,23 +36,15 @@ internal class CreatePostCommandHandler
         }
         catch (PostNotValidException ex)
         {
-            result.IsError = true;
-
-            result.Errors = ex.ValidationErrors
-                .ConvertAll(errMessage => new Error
+            ex.ValidationErrors
+                .ForEach(errMessage =>
                 {
-                    Code = HttpStatusCode.BadRequest,
-                    Message = errMessage,
+                    result.AddError(errMessage);
                 });
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            result.Errors = [new Error
-            {
-                Message = ex.InnerException?.Message ?? ex.Message,
-                Code = HttpStatusCode.BadRequest
-            }];
+            result.AddUnknownError(ex.Message);
         }
 
         return result;

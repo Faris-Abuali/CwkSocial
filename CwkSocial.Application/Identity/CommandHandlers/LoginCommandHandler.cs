@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 
 namespace CwkSocial.Application.Identity.CommandHandlers;
@@ -36,19 +37,14 @@ internal class LoginCommandHandler
         {
             var identityUser = await ValidateAndGetIdentityAsync(request, result);
 
-            if (identityUser is null) return result;
+            if (result.IsError || identityUser is null) return result;
 
             var userProfile = await _context.UserProfiles
                 .FirstOrDefaultAsync(up => up.IdentityId == identityUser.Id);
 
             if (userProfile is null)
             {
-                result.Errors = [
-                    new Error
-                    {
-                        Message = "User profile not found"
-                    }
-                ];
+                result.AddError("User profile not found");
                 return result;
             }
 
@@ -56,14 +52,11 @@ internal class LoginCommandHandler
         }
         catch (Exception ex)
         {
-            result.Errors = [new Error{
-                Message = ex.Message,
-            }];
+            result.AddUnknownError(ex.Message);
         }
 
         return result;
     }
-
 
     private async Task<IdentityUser?> ValidateAndGetIdentityAsync(
         LoginCommand request,
@@ -73,27 +66,14 @@ internal class LoginCommandHandler
 
         if (identityUser is null)
         {
-            result.Errors = [
-                new Error
-                    {
-                        Message = $"No such user found with user name {request.UserName}"
-                    }
-            ];
+            result.AddError(IdentityErrorMessages.NonExistentIdentityUser);
             return null;
         }
 
         var passwordValid = await _userManager.CheckPasswordAsync(identityUser, request.Password);
 
         if (!passwordValid)
-        {
-            result.Errors = [
-                new Error
-                    {
-                        Message = "Invalid login credentials"
-                    }
-            ];
-            return null;
-        }
+            result.AddError(IdentityErrorMessages.InvalidLoginCredentials);
 
         return identityUser;
     }

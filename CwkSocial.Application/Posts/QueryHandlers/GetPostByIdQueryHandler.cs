@@ -3,7 +3,6 @@ using CwkSocial.Application.Models;
 using CwkSocial.Application.Posts.Queries;
 using CwkSocial.DataAccess;
 using CwkSocial.Domain.Aggregates.PostAggregate;
-using CwkSocial.Domain.Aggregates.UserProfileAggregate;
 using MediatR;
 using System.Net;
 
@@ -26,12 +25,10 @@ internal class GetPostByIdQueryHandler : IRequestHandler<GetPostByIdQuery, Opera
 
         if (post is null)
         {
-            result.IsError = true;
-            result.Errors = [new Error
-            {
-                Code = HttpStatusCode.NotFound,
-                Message = $"No Post found with ID: {request.PostId}"
-            }];
+            result.AddError(
+                    string.Format(PostsErrorMessages.PostNotFound, request.PostId),
+                    HttpStatusCode.NotFound);
+
             return result;
         }
 

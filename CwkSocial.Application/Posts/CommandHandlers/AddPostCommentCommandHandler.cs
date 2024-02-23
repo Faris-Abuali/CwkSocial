@@ -27,8 +27,10 @@ public class AddPostCommentHandler : IRequestHandler<AddPostCommentCommand, Oper
         {
             if (post is null)
             {
-                result.IsError = true;
-                result.Errors = [new Error { Message = $"No post found with id {request.PostId}" }];
+                result.AddError(
+                    string.Format(PostsErrorMessages.PostNotFound, request.PostId),
+                    HttpStatusCode.NotFound);
+
                 return result;
             }
 
@@ -57,23 +59,12 @@ public class AddPostCommentHandler : IRequestHandler<AddPostCommentCommand, Oper
 
         catch (PostCommentNotValidException ex)
         {
-            result.IsError = true;
-
-            result.Errors = ex.ValidationErrors
-                .ConvertAll(errMessage => new Error
-                {
-                    Code = HttpStatusCode.BadRequest,
-                    Message = errMessage,
-                });
+            ex.ValidationErrors
+                .ForEach(msg => result.AddError(msg));
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            result.Errors = [new Error
-            {
-                Message = ex.InnerException?.Message ?? ex.Message,
-                Code = HttpStatusCode.BadRequest
-            }];
+            result.AddUnknownError(ex.Message);
         }
 
         return result;

@@ -8,7 +8,6 @@ using CwkSocial.Application.Posts.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace CwkSocial.Api.Controllers.V1;
 
@@ -112,9 +111,13 @@ public class PostsController : ApiController
     [ValidateGuid("id")]
     public async Task<IActionResult> DeletePost(string id)
     {
+        // Get the UserProfileId from the token claims
+        var userProfileId = HttpContext.GetUserProfileIdClaimValue();
+
         var command = new DeletePostCommand
         {
-            PostId = Guid.Parse(id)
+            PostId = Guid.Parse(id),
+            UserProfileId = userProfileId
         };
 
         var result = await _mediator.Send(command);
