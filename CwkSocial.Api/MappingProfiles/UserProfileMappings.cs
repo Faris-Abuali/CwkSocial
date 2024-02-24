@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CwkSocial.Api.Contracts.Post.Responses;
 using CwkSocial.Api.Contracts.UserProfile.Requests;
 using CwkSocial.Api.Contracts.UserProfile.Responses;
 using CwkSocial.Application.UserProfiles.Commands;
@@ -20,5 +21,10 @@ public class UserProfileMappings : Profile
         CreateMap<BasicInfo, BasicInformation>();
 
         CreateMap<CreateUserProfileRequest, UpdateUserProfileCommand>();
+
+        CreateMap<UserProfile, ReactionAuthor>()
+            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => $"{src.BasicInfo!.FirstName} {src.BasicInfo.LastName}"))
+            .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.BasicInfo!.CurrentCity))
+            .ForMember(dest => dest.UserProfileId, opt => opt.MapFrom(src => src.UserProfileId));
     }
 }

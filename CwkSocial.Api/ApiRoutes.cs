@@ -1,4 +1,8 @@
-﻿namespace CwkSocial.Api;
+﻿using Azure.Core.Pipeline;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
+using System.Collections;
+
+namespace CwkSocial.Api;
 
 public class ApiRoutes
 {
@@ -14,6 +18,8 @@ public class ApiRoutes
         public const string IdRoute = "{id}";
         public const string PostComments = "{postId}/comments";
         public const string CommentById = "{postId}/comments/{commentId}";
+        public const string PostReactions = "{postId}/reactions";
+        public const string ReactionById = "{postId}/reactions/{reactionId}";
     }
 
     public static class Identity

@@ -19,8 +19,6 @@ internal class UserProfileConfig : IEntityTypeConfiguration<UserProfile>
             opt.Property(bi => bi.Phone).HasColumnName("Phone");
             opt.Property(bi => bi.DateOfBirth).HasColumnName("DateOfBirth");
             opt.Property(bi => bi.CurrentCity).HasColumnName("CurrentCity");
-
-
         });
     }
 }

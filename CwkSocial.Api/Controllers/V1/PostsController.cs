@@ -149,10 +149,12 @@ public class PostsController : ApiController
     [ValidateModel]
     public async Task<IActionResult> AddCommentToPost(string postId, [FromBody] CreatePostCommentRequest request)
     {
+        var userProfileId = HttpContext.GetUserProfileIdClaimValue();
+
         var command = new AddPostCommentCommand
         {
             PostId = Guid.Parse(postId),
-            UserProfileId = request.UserProfileId,
+            UserProfileId = userProfileId,
             CommentText = request.Text
         };
 
@@ -163,10 +165,55 @@ public class PostsController : ApiController
         var response = _mapper.Map<PostCommentResponse>(result.Payload);
 
         return Ok(response);
+    }
 
-        //return CreatedAtAction(
-        //         nameof(GetCommentsByPostId),
-        //         new { postId = response.PostId },
-        //         response);
+    [HttpGet]
+    [Route(ApiRoutes.Posts.PostReactions)]
+    [ValidateGuid("postId")]
+    public async Task<IActionResult> GetPostReactions(string postId)
+    {
+        var postGuid = Guid.Parse(postId);
+
+        var query = new GetPostReactionsQuery { PostId = postGuid };
+
+        var result = await _mediator.Send(query);
+
+        if (result.IsError) return HandleErrorResponse(result.Errors);
+
+        var response = _mapper.Map<List<PostReactionResponse>>(result.Payload);
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Adds a reaction to a post
+    /// </summary>
+    /// <param name="postId">The post Id</param>
+    /// <returns> if success</returns>
+    /// <response code="200">Returns the newly added reaction</response>
+    /// <response code="404">If the post is not found</response>
+    [HttpPost]
+    [Route(ApiRoutes.Posts.PostReactions)]
+    [ValidateGuid("postId")]
+    [ValidateModel]
+    [ProducesResponseType(typeof(PostReactionResponse[]), StatusCodes.Status200OK)]
+    public async Task<IActionResult> AddReactionToPost(string postId, [FromBody] CreatePostReactionRequest request)
+    {
+        var userProfileId = HttpContext.GetUserProfileIdClaimValue();
+
+        var command = new AddPostReactionCommand
+        {
+            PostId = Guid.Parse(postId),
+            UserProfileId = userProfileId,
+            ReactionType = request.ReactionType,
+        };
+
+        var result = await _mediator.Send(command);
+
+        if (result.IsError) return HandleErrorResponse(result.Errors);
+
+        var response = _mapper.Map<PostReactionResponse>(result.Payload);
+
+        return Ok(response);
     }
 }
