@@ -4,6 +4,7 @@ using CwkSocial.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CwkSocial.DataAccess.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240224232720_SetNull-Post-when-UserProfile-is-deleted")]
+    partial class SetNullPostwhenUserProfileisdeleted
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,11 +102,9 @@ namespace CwkSocial.DataAccess.Migrations
 
                     b.HasKey("ReactionId");
 
-                    b.HasIndex("UserProfileId");
+                    b.HasIndex("PostId");
 
-                    b.HasIndex("PostId", "UserProfileId")
-                        .IsUnique()
-                        .HasFilter("[UserProfileId] IS NOT NULL");
+                    b.HasIndex("UserProfileId");
 
                     b.ToTable("PostReaction");
                 });

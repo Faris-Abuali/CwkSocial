@@ -3,6 +3,7 @@ using CwkSocial.Api.Contracts.Identity;
 using CwkSocial.Api.Filters;
 using CwkSocial.Application.Identity.Commands;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CwkSocial.Api.Controllers.V1;
@@ -57,5 +58,26 @@ public class IdentityController : ApiController
         };
 
         return Ok(response);
+    }
+
+    [HttpDelete]
+    [Route(ApiRoutes.Identity.IdentityById)]
+    [ValidateGuid("identityUserId")]
+    [Authorize()]
+    public async Task<IActionResult> DeleteAccount(string identityUserId, CancellationToken cancellationToken)
+    {
+        var userProfileId = HttpContext.GetUserProfileIdClaimValue();
+
+        var command = new DeleteAccountCommand
+        {
+            IdentityUserId = Guid.Parse(identityUserId),
+            UserProfileId = userProfileId
+        };
+
+        var result = await _mediator.Send(command, cancellationToken);
+
+        if (result.IsError) return HandleErrorResponse(result.Errors);
+
+        return NoContent();
     }
 }

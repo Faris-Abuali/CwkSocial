@@ -8,7 +8,7 @@ public class PostReaction
 
     public Guid PostId { get; private set; } // Foreign key to Post
 
-    public Guid UserProfileId { get; private set; } // Foreign key to UserProfile
+    public Guid? UserProfileId { get; private set; } // Foreign key to UserProfile
 
     public UserProfile UserProfile { get; private set; } = null!;// Navigation property for EF Core
 

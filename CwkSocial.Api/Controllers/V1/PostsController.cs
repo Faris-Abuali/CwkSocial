@@ -8,6 +8,7 @@ using CwkSocial.Application.Posts.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace CwkSocial.Api.Controllers.V1;
 
@@ -206,6 +207,32 @@ public class PostsController : ApiController
             PostId = Guid.Parse(postId),
             UserProfileId = userProfileId,
             ReactionType = request.ReactionType,
+        };
+
+        var result = await _mediator.Send(command);
+
+        if (result.IsError) return HandleErrorResponse(result.Errors);
+
+        var response = _mapper.Map<PostReactionResponse>(result.Payload);
+
+        return Ok(response);
+    }
+
+    [HttpDelete]
+    [Route(ApiRoutes.Posts.ReactionById)]
+    [ValidateGuid("postId")]
+    [ValidateGuid("reactionId")]
+    public async Task<IActionResult> RemovePostReaction(
+        string postId,
+        string reactionId)
+    {
+        var userProfileId = HttpContext.GetUserProfileIdClaimValue();
+
+        var command = new RemovePostReactionCommand
+        {
+            PostId = Guid.Parse(postId),
+            ReactionId = Guid.Parse(reactionId),
+            UserProfileId = userProfileId
         };
 
         var result = await _mediator.Send(command);

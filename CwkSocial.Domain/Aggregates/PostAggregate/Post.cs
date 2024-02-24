@@ -14,7 +14,7 @@ public class Post
     // properties
     public Guid PostId { get; private set; }
 
-    public Guid UserProfileId { get; private set; } // Foreign key to UserProfile
+    public Guid? UserProfileId { get; private set; } // Foreign key to UserProfile
 
     public UserProfile? UserProfile { get; private set; } // Navigation property for EF Core
 

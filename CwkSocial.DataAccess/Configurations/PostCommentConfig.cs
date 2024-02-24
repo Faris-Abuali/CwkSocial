@@ -14,6 +14,6 @@ internal class PostCommentConfig : IEntityTypeConfiguration<PostComment>
         builder.HasOne(pc => pc.UserProfile)
                .WithMany()
                .HasForeignKey(pc => pc.UserProfileId)
-               .OnDelete(DeleteBehavior.NoAction);
+               .OnDelete(DeleteBehavior.SetNull);
     }
 }

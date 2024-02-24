@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using CwkSocial.Domain.Aggregates.UserProfileAggregate;
+using Microsoft.AspNetCore.Identity;
 
 namespace CwkSocial.DataAccess.Configurations;
 
@@ -20,5 +21,11 @@ internal class UserProfileConfig : IEntityTypeConfiguration<UserProfile>
             opt.Property(bi => bi.DateOfBirth).HasColumnName("DateOfBirth");
             opt.Property(bi => bi.CurrentCity).HasColumnName("CurrentCity");
         });
+
+        //// Add foreign key to IdentityUser
+        //builder.HasOne<IdentityUser>()
+        //       .WithMany()
+        //       .HasForeignKey(up => up.IdentityId)
+        //       .OnDelete(DeleteBehavior.Cascade);
     }
 }

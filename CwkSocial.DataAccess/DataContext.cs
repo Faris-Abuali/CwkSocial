@@ -26,5 +26,6 @@ public class DataContext : IdentityDbContext
         modelBuilder.ApplyConfiguration(new IdentityUserLoginConfig());
         modelBuilder.ApplyConfiguration(new IdentityUserRoleConfig());
         modelBuilder.ApplyConfiguration(new IdentityUserTokenConfig());
+        modelBuilder.ApplyConfiguration(new PostConfig());
     }
 }

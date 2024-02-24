@@ -4,6 +4,7 @@ using CwkSocial.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CwkSocial.DataAccess.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240224224707_DontDeletePostsWhenUserProfileIsDeleted")]
+    partial class DontDeletePostsWhenUserProfileIsDeleted
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,7 +41,7 @@ namespace CwkSocial.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("UserProfileId")
+                    b.Property<Guid>("UserProfileId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("PostId");
@@ -67,7 +70,7 @@ namespace CwkSocial.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("UserProfileId")
+                    b.Property<Guid>("UserProfileId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("CommentId");
@@ -94,7 +97,7 @@ namespace CwkSocial.DataAccess.Migrations
                     b.Property<int>("ReactionType")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("UserProfileId")
+                    b.Property<Guid>("UserProfileId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ReactionId");
@@ -102,8 +105,7 @@ namespace CwkSocial.DataAccess.Migrations
                     b.HasIndex("UserProfileId");
 
                     b.HasIndex("PostId", "UserProfileId")
-                        .IsUnique()
-                        .HasFilter("[UserProfileId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("PostReaction");
                 });
@@ -301,7 +303,8 @@ namespace CwkSocial.DataAccess.Migrations
                     b.HasOne("CwkSocial.Domain.Aggregates.UserProfileAggregate.UserProfile", "UserProfile")
                         .WithMany()
                         .HasForeignKey("UserProfileId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("UserProfile");
                 });
@@ -317,7 +320,8 @@ namespace CwkSocial.DataAccess.Migrations
                     b.HasOne("CwkSocial.Domain.Aggregates.UserProfileAggregate.UserProfile", "UserProfile")
                         .WithMany()
                         .HasForeignKey("UserProfileId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("UserProfile");
                 });
@@ -333,7 +337,8 @@ namespace CwkSocial.DataAccess.Migrations
                     b.HasOne("CwkSocial.Domain.Aggregates.UserProfileAggregate.UserProfile", "UserProfile")
                         .WithMany()
                         .HasForeignKey("UserProfileId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("UserProfile");
                 });

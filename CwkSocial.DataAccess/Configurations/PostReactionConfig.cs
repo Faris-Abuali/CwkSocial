@@ -14,6 +14,12 @@ internal class PostReactionConfig : IEntityTypeConfiguration<PostReaction>
         builder.HasOne(pc => pc.UserProfile)
                .WithMany()
                .HasForeignKey(pc => pc.UserProfileId)
-               .OnDelete(DeleteBehavior.NoAction);
+               .OnDelete(DeleteBehavior.SetNull);
+
+
+        // Create unique key for PostId and UserProfileId
+        // This will prevent a user from reacting to a post more than once
+        builder.HasIndex(pr => new { pr.PostId, pr.UserProfileId })
+               .IsUnique();
     }
 }

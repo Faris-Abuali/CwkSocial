@@ -1,6 +1,7 @@
 ﻿using Azure.Core.Pipeline;
 using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using System.Collections;
+using System.Dynamic;
 
 namespace CwkSocial.Api;
 
@@ -26,5 +27,6 @@ public class ApiRoutes
     {
         public const string Login = "login";
         public const string Registration = "registration";
+        public const string IdentityById = "{identityUserId}";
     }
 }
