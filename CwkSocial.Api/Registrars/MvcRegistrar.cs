@@ -13,7 +13,7 @@ public class MvcRegistrar : IWebApplicationBuilderRegistrar
         builder.Services.AddControllers(options =>
         {
             options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
-            options.Filters.Add(typeof(CwkSocialExceptionHandler)); // Add the exception handler filter to the global filter collection
+            //options.Filters.Add(typeof(CwkSocialExceptionHandler)); // Add the exception handler filter to the global filter collection
         });
 
         builder.Services.AddApiVersioning(config =>

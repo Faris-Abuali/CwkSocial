@@ -1,7 +1,11 @@
 ﻿using CwkSocial.Api.Contracts.Common;
+using ErrorOr;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Net;
+using System.Text.Json;
 
 namespace CwkSocial.Api.Filters;
 
@@ -17,28 +21,18 @@ public class ValidateModelAttribute : ActionFilterAttribute
     {
         if (!context.ModelState.IsValid)
         {
-            var errors = new List<string>(); // Initialize an empty list
+            //var errors = new SerializableError();
 
-            foreach (var modelStateEntry in context.ModelState)
-            {
-                foreach (var error in modelStateEntry.Value.Errors)
-                {
-                    errors.Add(error.ErrorMessage);
-                }
-            }
+            //foreach (var modelStateEntry in context.ModelState)
+            //{
+            //    foreach (var error in modelStateEntry.Value.Errors)
+            //    {
+            //        errors.Add(modelStateEntry.Key, error.ErrorMessage);
+            //    }
+            //}
 
-            var response = new ErrorResponse
-            {
-                Phrase = "Bad Request",
-                Code = (int)HttpStatusCode.BadRequest,
-                Timestamp = DateTime.UtcNow,
-                Errors = errors
-            };
-
-            context.Result = new JsonResult(response)
-            {
-                StatusCode = (int)HttpStatusCode.BadRequest
-            };
+            context.Result = new BadRequestObjectResult(
+                new ValidationProblemDetails(context.ModelState));
         }
     }
 }

@@ -23,5 +23,7 @@ public class CwkSocialExceptionHandler : ExceptionFilterAttribute
         {
             StatusCode = (int)HttpStatusCode.InternalServerError
         };
+
+        context.ExceptionHandled = true;
     }
 }

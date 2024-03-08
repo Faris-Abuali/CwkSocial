@@ -23,6 +23,9 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
     <ProjectReference Include="../CwkSocial.Domain/CwkSocial.Domain.csproj" />
     <ProjectReference Include="../CwkSocial.Application/CwkSocial.Application.csproj" />
-    <ProjectReference Include="..\CwkSocial.DataAccess\CwkSocial.DataAccess.csproj" />
+    <ProjectReference Include="../CwkSocial.DataAccess/CwkSocial.DataAccess.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Common\Errors\" />
   </ItemGroup>
 </Project>

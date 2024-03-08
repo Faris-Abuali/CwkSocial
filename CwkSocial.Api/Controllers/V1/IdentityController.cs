@@ -10,7 +10,6 @@ namespace CwkSocial.Api.Controllers.V1;
 
 [ApiVersion("1.0")]
 [Route(ApiRoutes.BaseRoute)]
-[ApiController]
 public class IdentityController : ApiController
 {
     private readonly ISender _mediator;
@@ -24,7 +23,7 @@ public class IdentityController : ApiController
 
     [HttpPost]
     [Route(ApiRoutes.Identity.Registration)]
-    [ValidateModel]
+    //[ValidateModel]
     public async Task<IActionResult> Register(RegisterUserRequest request)
     {
         var command = _mapper.Map<RegisterUserCommand>(request);
@@ -43,18 +42,19 @@ public class IdentityController : ApiController
 
     [HttpPost]
     [Route(ApiRoutes.Identity.Login)]
-    [ValidateModel]
+    //[ValidateModel]
     public async Task<IActionResult> Login(LoginRequest request)
     {
         var command = _mapper.Map<LoginCommand>(request);
 
         var result = await _mediator.Send(command);
 
-        if (result.IsError) return HandleErrorResponse(result.Errors);
+      
+        if (result.IsError) return Problem(result.Errors);
 
         var response = new AuthenticationResponse
         {
-            Token = result.Payload!
+            Token = result.Value
         };
 
         return Ok(response);

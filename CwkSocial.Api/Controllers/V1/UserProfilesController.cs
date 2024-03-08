@@ -12,7 +12,6 @@ namespace CwkSocial.Api.Controllers.V1;
 
 [ApiVersion("1.0")]
 [Route(ApiRoutes.BaseRoute)]
-[ApiController]
 [Authorize()]
 public class UserProfilesController : ApiController
 {

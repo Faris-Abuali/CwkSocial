@@ -1,9 +1,9 @@
-﻿using CwkSocial.Application.Models;
+﻿using ErrorOr;
 using MediatR;
 
 namespace CwkSocial.Application.Identity.Commands;
 
-public class LoginCommand : IRequest<OperationResult<string>>
+public class LoginCommand : IRequest<ErrorOr<string>>
 {
     public required string UserName { get; init; }
 

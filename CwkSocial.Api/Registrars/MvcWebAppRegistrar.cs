@@ -18,6 +18,8 @@ public class MvcWebAppRegistrar : IWebApplicationRegistrar
             }
         });
 
+        app.UseExceptionHandler("/error");
+
         app.UseHttpsRedirection();
 
         app.UseAuthentication();
