@@ -1,6 +1,8 @@
 using CwkSocial.Domain.Aggregates.UserProfileAggregate;
 using CwkSocial.Domain.Exceptions;
+using CwkSocial.Domain.Extensions;
 using CwkSocial.Domain.Validators.PostsValidators;
+using ErrorOr;
 
 namespace CwkSocial.Domain.Aggregates.PostAggregate;
 
@@ -32,7 +34,7 @@ public class PostComment
     /// <param name="text"></param>
     /// <returns>The newly created comment</returns>
     /// <exception cref="PostCommentNotValidException"></exception>
-    public static PostComment Create(Guid postId, Guid userProfileId, string text)
+    public static ErrorOr<PostComment> Create(Guid postId, Guid userProfileId, string text)
     {
         var validator = new PostCommentValidator();
 
@@ -46,16 +48,19 @@ public class PostComment
             LastModified = DateTime.UtcNow
         };
 
-        var validationResult = validator.Validate(postComment);
+        //var validationResult = validator.Validate(postComment);
 
-        if (validationResult.IsValid) return postComment;
+        //if (validationResult.IsValid) return postComment;
 
-        var exception = new PostCommentNotValidException("Post comment is invalid")
-        {
-            ValidationErrors = validationResult.Errors.ConvertAll(e => e.ErrorMessage)
-        };
+        //var exception = new PostCommentNotValidException("Post comment is invalid")
+        //{
+        //    ValidationErrors = validationResult.Errors.ConvertAll(e => e.ErrorMessage)
+        //};
 
-        throw exception;
+        //throw exception;
+
+        var validationResult = validator.ValidateAndConvertToErrorOr(postComment);
+        return validationResult;
     }
 
     // public methods

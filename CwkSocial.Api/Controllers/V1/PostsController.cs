@@ -3,12 +3,20 @@ using CwkSocial.Api.Contracts.Post.Requests;
 using CwkSocial.Api.Contracts.Post.Responses;
 using CwkSocial.Api.Contracts.UserProfile.Responses;
 using CwkSocial.Api.Filters;
-using CwkSocial.Application.Posts.Commands;
-using CwkSocial.Application.Posts.Queries;
+using CwkSocial.Application.Posts.AddPostComment;
+using CwkSocial.Application.Posts.AddPostReaction;
+using CwkSocial.Application.Posts.CreatePost;
+using CwkSocial.Application.Posts.DeletePost;
+using CwkSocial.Application.Posts.GetAllPosts;
+using CwkSocial.Application.Posts.GetPostById;
+using CwkSocial.Application.Posts.GetPostComments;
+using CwkSocial.Application.Posts.GetPostReactions;
+using CwkSocial.Application.Posts.RemovePostReaction;
+using CwkSocial.Application.Posts.UpdatePost;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
+
 
 namespace CwkSocial.Api.Controllers.V1;
 
@@ -31,11 +39,9 @@ public class PostsController : ApiController
     {
         var result = await _mediator.Send(new GetAllPostsQuery());
 
-        if (result.IsError) return HandleErrorResponse(result.Errors);
-
-        var response = _mapper.Map<List<PostResponse>>(result.Payload);
-
-        return Ok(response);
+        return result.Match(
+            posts => Ok(_mapper.Map<List<PostResponse>>(posts)),
+            Problem);
     }
 
     [HttpGet]
@@ -49,11 +55,9 @@ public class PostsController : ApiController
 
         var result = await _mediator.Send(query);
 
-        if (result.IsError) return HandleErrorResponse(result.Errors);
-
-        var response = _mapper.Map<PostResponse>(result.Payload);
-
-        return Ok(response);
+        return result.Match(
+            post => Ok(_mapper.Map<PostResponse>(post)),
+            Problem);
     }
 
     [HttpPost]
@@ -71,14 +75,17 @@ public class PostsController : ApiController
 
         var result = await _mediator.Send(command);
 
-        if (result.IsError) return HandleErrorResponse(result.Errors);
+        return result.Match(
+            post =>
+            {
+                var response = _mapper.Map<PostResponse>(post);
 
-        var response = _mapper.Map<PostResponse>(result.Payload);
-
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = response.PostId },
-            response);
+                return CreatedAtAction(
+                    nameof(GetById),
+                    new { id = response.PostId },
+                    response);
+            },
+            Problem);
     }
 
     [HttpPut]
@@ -101,9 +108,9 @@ public class PostsController : ApiController
 
         var result = await _mediator.Send(command);
 
-        return result.IsError
-            ? HandleErrorResponse(result.Errors)
-            : NoContent();
+        return result.Match(
+            _ => NoContent(),
+            Problem);
     }
 
     [HttpDelete]
@@ -122,9 +129,9 @@ public class PostsController : ApiController
 
         var result = await _mediator.Send(command);
 
-        return result.IsError
-            ? HandleErrorResponse(result.Errors)
-            : NoContent();
+        return result.Match(
+            _ => NoContent(),
+            Problem);
     }
 
     [HttpGet]
@@ -136,11 +143,9 @@ public class PostsController : ApiController
 
         var result = await _mediator.Send(query);
 
-        if (result.IsError) return HandleErrorResponse(result.Errors);
-
-        var response = _mapper.Map<List<PostCommentResponse>>(result.Payload);
-
-        return Ok(response);
+        return result.Match(
+         comments => Ok(_mapper.Map<List<PostCommentResponse>>(comments)),
+         Problem);
     }
 
     [HttpPost]
@@ -160,11 +165,9 @@ public class PostsController : ApiController
 
         var result = await _mediator.Send(command);
 
-        if (result.IsError) return HandleErrorResponse(result.Errors);
-
-        var response = _mapper.Map<PostCommentResponse>(result.Payload);
-
-        return Ok(response);
+        return result.Match(
+             comment => Ok(_mapper.Map<PostCommentResponse>(comment)),
+             Problem);
     }
 
     [HttpGet]
@@ -178,11 +181,9 @@ public class PostsController : ApiController
 
         var result = await _mediator.Send(query);
 
-        if (result.IsError) return HandleErrorResponse(result.Errors);
-
-        var response = _mapper.Map<List<PostReactionResponse>>(result.Payload);
-
-        return Ok(response);
+        return result.Match(
+             reactions => Ok(_mapper.Map<List<PostReactionResponse>>(reactions)),
+             Problem);
     }
 
     /// <summary>
@@ -210,11 +211,9 @@ public class PostsController : ApiController
 
         var result = await _mediator.Send(command);
 
-        if (result.IsError) return HandleErrorResponse(result.Errors);
-
-        var response = _mapper.Map<PostReactionResponse>(result.Payload);
-
-        return Ok(response);
+        return result.Match(
+             reaction => Ok(_mapper.Map<PostReactionResponse>(reaction)),
+             Problem);
     }
 
     [HttpDelete]
@@ -236,10 +235,8 @@ public class PostsController : ApiController
 
         var result = await _mediator.Send(command);
 
-        if (result.IsError) return HandleErrorResponse(result.Errors);
-
-        var response = _mapper.Map<PostReactionResponse>(result.Payload);
-
-        return Ok(response);
+        return result.Match(
+             reaction => Ok(_mapper.Map<PostReactionResponse>(reaction)),
+             Problem);
     }
 }

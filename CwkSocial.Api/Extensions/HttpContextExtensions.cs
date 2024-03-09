@@ -22,9 +22,19 @@ public static class HttpContextExtensions
     /// <returns>The value of a claim as a Guid</returns>
     private static Guid GetGuidClaimValue(string key, HttpContext context)
     {
-        var identity = context.User.Identity as ClaimsIdentity;
-        var stringValue = identity?.FindFirst(key)?.Value;
-        return Guid.Parse(stringValue!);
+        ArgumentNullException.ThrowIfNull(nameof(context));
 
+        var claim = context.User?.Claims.FirstOrDefault(c => c.Type == key);
+
+        if (claim is null)
+            throw new InvalidOperationException($"Claim with key '{key}' not found");
+
+        //var identity = context.User.Identity as ClaimsIdentity;
+        //var stringValue = identity?.FindFirst(key)?.Value;
+
+        if (!Guid.TryParse(claim.Value, out var guidValue))
+            throw new FormatException($"Failed to parse claim value '{claim.Value}' to Guid");
+
+        return guidValue;
     }
 }

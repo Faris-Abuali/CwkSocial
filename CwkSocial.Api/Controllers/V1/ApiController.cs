@@ -1,48 +1,13 @@
 ﻿using CwkSocial.Api.Common.Http;
-using CwkSocial.Api.Contracts.Common;
 using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.Net;
-using AppError = CwkSocial.Application.Models.Error;
 
 namespace CwkSocial.Api.Controllers.V1;
 
 [ApiController]
 public class ApiController : ControllerBase
 {
-    protected IActionResult HandleErrorResponse(List<AppError> errors)
-    {
-        var firstError = errors.First();
-
-        if (firstError is null)
-        {
-            return StatusCode(
-            (int)HttpStatusCode.InternalServerError,
-            new ErrorResponse
-            {
-                Phrase = "Internal Server Error",
-                Code = (int)HttpStatusCode.InternalServerError,
-                Timestamp = DateTime.UtcNow,
-                Errors = []
-            });
-
-        }
-
-        var response = new ErrorResponse
-        {
-            Phrase = "Bad Request",
-            Code = (int)firstError.Code,
-            Timestamp = DateTime.UtcNow,
-            Errors = errors.ConvertAll(err => err.Message)
-        };
-
-        return new JsonResult(response)
-        {
-            StatusCode = (int)firstError.Code
-        };
-    }
-
     /// <summary>
     /// Overrides the ControllerBase.Problem to customize our error structure
     /// </summary>
@@ -83,9 +48,14 @@ public class ApiController : ControllerBase
             _ => StatusCodes.Status500InternalServerError
         };
 
+        var detail = firstError.Metadata != null && firstError.Metadata.Count > 0
+                        ? firstError.Metadata.Values.First()?.ToString()
+                        : null;
+
         return Problem(
             statusCode: statusCode,
-            title: firstError.Description);
+            title: firstError.Description,
+            detail: detail);
     }
 
     /// <summary>

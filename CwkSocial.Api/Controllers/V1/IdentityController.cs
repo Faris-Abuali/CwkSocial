@@ -2,6 +2,8 @@
 using CwkSocial.Api.Contracts.Identity;
 using CwkSocial.Api.Filters;
 using CwkSocial.Application.Identity.Commands;
+using CwkSocial.Application.Identity.DeleteAccount;
+using CwkSocial.Application.Identity.RegisterUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,14 +32,9 @@ public class IdentityController : ApiController
 
         var result = await _mediator.Send(command);
 
-        if (result.IsError) return HandleErrorResponse(result.Errors);
-
-        var response = new AuthenticationResponse
-        {
-            Token = result.Payload!
-        };
-
-        return Ok(response);
+        return result.Match(
+            token => Ok(new AuthenticationResponse { Token = token }),
+            Problem);
     }
 
     [HttpPost]
@@ -76,8 +73,8 @@ public class IdentityController : ApiController
 
         var result = await _mediator.Send(command, cancellationToken);
 
-        if (result.IsError) return HandleErrorResponse(result.Errors);
-
-        return NoContent();
+        return result.Match(
+            _ => NoContent(),
+            Problem);
     }
 }

@@ -1,17 +1,10 @@
-﻿using CwkSocial.Api.Contracts.Common;
-using ErrorOr;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.Net;
-using System.Text.Json;
 
 namespace CwkSocial.Api.Filters;
 
 public class ValidateModelAttribute : ActionFilterAttribute
 {
-
     /// <summary>
     /// This method is called before the action method is invoked.
     /// It checks if the model state is valid and if not, it returns a BadRequest response.

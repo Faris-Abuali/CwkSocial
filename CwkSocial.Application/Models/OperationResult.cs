@@ -3,6 +3,7 @@ using System.Net;
 
 namespace CwkSocial.Application.Models;
 
+[Obsolete("This class is deprecated. Use ErrorOr package instead")]
 public class OperationResult<T>
 {
     public T? Payload { get; set; }

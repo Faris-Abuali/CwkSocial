@@ -1,5 +1,7 @@
 using CwkSocial.Domain.Exceptions;
+using CwkSocial.Domain.Extensions;
 using CwkSocial.Domain.Validators.UserProfileValidators;
+using ErrorOr;
 
 namespace CwkSocial.Domain.Aggregates.UserProfileAggregate;
 
@@ -34,7 +36,7 @@ public class BasicInfo
     /// <param name="currentCity"></param>
     /// <returns>An instance of BasicInfo</returns>
     /// <exception cref="UserProfileNotValidException"></exception>
-    public static BasicInfo Create(
+    public static ErrorOr<BasicInfo> Create(
         string firstName,
         string lastName,
         string emailAddress,
@@ -54,16 +56,21 @@ public class BasicInfo
             CurrentCity = currentCity
         };
 
-        var validationResult = validator.Validate(basicInfo);
 
-        if (validationResult.IsValid) return basicInfo;
+        //var validationResult = validator.Validate(basicInfo);
 
-        var exception = new UserProfileNotValidException("The basic info is not valid.")
-        {
-            ValidationErrors = validationResult.Errors.ConvertAll(e => e.ErrorMessage)
-        };
+        //if (validationResult.IsValid) return basicInfo;
 
-        throw exception;
+        var validationResult = validator.ValidateAndConvertToErrorOr<BasicInfo>(basicInfo);
+
+        return validationResult;
+
+        //var exception = new UserProfileNotValidException("The basic info is not valid.")
+        //{
+        //    ValidationErrors = validationResult.Errors.ConvertAll(e => e.ErrorMessage)
+        //};
+
+        //throw exception;
     }
 
     // Note: We don't have any public methods to update the basic info.

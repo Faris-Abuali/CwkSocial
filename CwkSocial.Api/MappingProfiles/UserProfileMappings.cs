@@ -2,7 +2,8 @@
 using CwkSocial.Api.Contracts.Post.Responses;
 using CwkSocial.Api.Contracts.UserProfile.Requests;
 using CwkSocial.Api.Contracts.UserProfile.Responses;
-using CwkSocial.Application.UserProfiles.Commands;
+using CwkSocial.Application.UserProfiles.CreateUserProfile;
+using CwkSocial.Application.UserProfiles.UpdateUserProfile;
 using CwkSocial.Domain.Aggregates.UserProfileAggregate;
 
 namespace CwkSocial.Api.MappingProfiles;

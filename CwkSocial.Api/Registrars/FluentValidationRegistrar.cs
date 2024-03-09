@@ -1,6 +1,6 @@
 ﻿
 using CwkSocial.Application.Common.Behaviors;
-using CwkSocial.Application.UserProfiles.Queries;
+using CwkSocial.Application.UserProfiles.GetAllUserProfiles;
 using FluentValidation;
 using MediatR;
 using System.Reflection;

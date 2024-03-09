@@ -2,8 +2,10 @@ using AutoMapper;
 using CwkSocial.Api.Contracts.UserProfile.Requests;
 using CwkSocial.Api.Contracts.UserProfile.Responses;
 using CwkSocial.Api.Filters;
-using CwkSocial.Application.UserProfiles.Commands;
-using CwkSocial.Application.UserProfiles.Queries;
+using CwkSocial.Application.UserProfiles.DeleteUserProfile;
+using CwkSocial.Application.UserProfiles.GetAllUserProfiles;
+using CwkSocial.Application.UserProfiles.GetUserProfileById;
+using CwkSocial.Application.UserProfiles.UpdateUserProfile;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,9 +33,9 @@ public class UserProfilesController : ApiController
 
         var result = await _mediator.Send(query);
 
-        var response = _mapper.Map<List<UserProfileResponse>>(result.Payload);
-
-        return Ok(response);
+        return result.Match(
+            profiles => Ok(_mapper.Map<List<UserProfileResponse>>(profiles)),
+            Problem);
     }
 
     //[HttpPost]
@@ -69,11 +71,9 @@ public class UserProfilesController : ApiController
 
         var result = await _mediator.Send(query);
 
-        if (result.IsError) return HandleErrorResponse(result.Errors);
-
-        var response = _mapper.Map<UserProfileResponse>(result.Payload);
-
-        return Ok(response);
+        return result.Match(
+            userProfile => Ok(_mapper.Map<UserProfileResponse>(userProfile)),
+            Problem);
     }
 
     [HttpPatch]
@@ -88,7 +88,9 @@ public class UserProfilesController : ApiController
 
         var result = await _mediator.Send(command);
 
-        return result.IsError ? HandleErrorResponse(result.Errors) : NoContent();
+        return result.Match(
+            _ => NoContent(),
+            Problem);
     }
 
     [HttpDelete]
@@ -103,6 +105,8 @@ public class UserProfilesController : ApiController
 
         var result = await _mediator.Send(command);
 
-        return result.IsError ? HandleErrorResponse(result.Errors) : NoContent();
+        return result.Match(
+            _ => NoContent(),
+            Problem);
     }
 }

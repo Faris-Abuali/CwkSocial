@@ -1,6 +1,8 @@
 using CwkSocial.Domain.Aggregates.UserProfileAggregate;
 using CwkSocial.Domain.Exceptions;
+using CwkSocial.Domain.Extensions;
 using CwkSocial.Domain.Validators.PostsValidators;
+using ErrorOr;
 
 namespace CwkSocial.Domain.Aggregates.PostAggregate;
 
@@ -40,7 +42,7 @@ public class Post
     /// <param name="textContent">The post content</param>
     /// <returns><see cref="Post"/></returns>
     /// <exception cref="PostNotValidException"></exception>
-    public static Post Create(Guid userProfileId, string textContent)
+    public static ErrorOr<Post> Create(Guid userProfileId, string textContent)
     {
         var validator = new PostValidator();
 
@@ -53,16 +55,20 @@ public class Post
             LastModified = DateTime.UtcNow
         };
 
-        var validationResult = validator.Validate(post);
+        //var validationResult = validator.Validate(post);
 
-        if (validationResult.IsValid) return post;
+        //if (validationResult.IsValid) return post;
 
-        var exception = new UserProfileNotValidException("Post is not valid")
-        {
-            ValidationErrors = validationResult.Errors.ConvertAll(e => e.ErrorMessage)
-        };
+        //var exception = new PostNotValidException("Post is not valid")
+        //{
+        //    ValidationErrors = validationResult.Errors.ConvertAll(e => e.ErrorMessage)
+        //};
 
-        throw exception;
+        //throw exception;
+
+        var validationResult = validator.ValidateAndConvertToErrorOr(post);
+
+        return validationResult;
     }
 
     // public methods

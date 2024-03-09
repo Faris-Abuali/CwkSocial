@@ -1,3 +1,5 @@
+using CwkSocial.Domain.Common.Errors;
+
 namespace CwkSocial.Domain.Aggregates.UserProfileAggregate;
 
 public class UserProfile

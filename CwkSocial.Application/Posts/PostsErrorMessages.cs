@@ -1,5 +1,6 @@
 ﻿namespace CwkSocial.Application.Posts;
 
+[Obsolete("This is deprecated, use `CwkSocial.Domain.Common.Errors` instead")]
 public class PostsErrorMessages
 {
     public const string PostNotFound = "No post found with ID: {0}";

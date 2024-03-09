@@ -3,7 +3,7 @@ using CwkSocial.Application.Common.Behaviors;
 using CwkSocial.Application.Identity.Commands;
 using CwkSocial.Application.Identity.Validators;
 using CwkSocial.Application.Services;
-using CwkSocial.Application.UserProfiles.Queries;
+using CwkSocial.Application.UserProfiles.GetAllUserProfiles;
 using ErrorOr;
 using FluentValidation;
 using MediatR;

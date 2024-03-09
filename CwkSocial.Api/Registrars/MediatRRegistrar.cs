@@ -1,4 +1,4 @@
-﻿using CwkSocial.Application.UserProfiles.Queries;
+﻿using CwkSocial.Application.UserProfiles.GetAllUserProfiles;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
