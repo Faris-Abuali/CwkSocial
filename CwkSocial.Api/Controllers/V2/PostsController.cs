@@ -11,12 +11,6 @@ public class PostsController : ControllerBase
     [Route("{id}")]
     public IActionResult GetById(int id)
     {
-        // var post = new Post
-        // {
-        //     Id = id,
-        //     Text = "Hello, universe!"
-        // };
-
-        return Ok();
+        return Ok(new { message = "Hello Universe"});
     }
 }

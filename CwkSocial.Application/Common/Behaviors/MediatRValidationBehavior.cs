@@ -4,14 +4,19 @@ using MediatR;
 
 namespace CwkSocial.Application.Common.Behaviors;
 
-public class FluentValidationBehavior<TRequest, TResponse>
+/// <summary>
+/// Pipeline behavior for MediatR requests that performs FluentValidation before passing the request to the command/query handler.
+/// </summary>
+/// <typeparam name="TRequest">Type of the request</typeparam>
+/// <typeparam name="TResponse">Type of the response.</typeparam>
+public class MediatRValidationBehavior<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
     where TResponse : IErrorOr
 {
     private readonly IValidator<TRequest>? _validator;
 
-    public FluentValidationBehavior(IValidator<TRequest>? validator = null)
+    public MediatRValidationBehavior(IValidator<TRequest>? validator = null)
     {
         _validator = validator;
     }
