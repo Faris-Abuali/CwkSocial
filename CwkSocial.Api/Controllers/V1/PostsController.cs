@@ -190,6 +190,7 @@ public class PostsController : ApiController
     /// Adds a reaction to a post
     /// </summary>
     /// <param name="postId">The post Id</param>
+    /// <param name="request"></param>
     /// <returns> if success</returns>
     /// <response code="200">Returns the newly added reaction</response>
     /// <response code="404">If the post is not found</response>

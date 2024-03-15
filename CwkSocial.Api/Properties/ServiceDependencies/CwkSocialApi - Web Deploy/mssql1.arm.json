@@ -4,7 +4,7 @@
   "parameters": {
     "resourceGroupName": {
       "type": "string",
-      "defaultValue": "rg-cwksocial-dev-001",
+      "defaultValue": "rg-cwksocial",
       "metadata": {
         "_parameterType": "resourceGroup",
         "description": "Name of the resource group for the resource. It is recommended to put resources under same resource group for better tracking."
@@ -12,7 +12,7 @@
     },
     "resourceGroupLocation": {
       "type": "string",
-      "defaultValue": "qatarcentral",
+      "defaultValue": "eastus",
       "metadata": {
         "_parameterType": "location",
         "description": "Location of the resource group. Resource groups could have different location than resources."
@@ -62,7 +62,7 @@
                 "family": "Gen5",
                 "capacity": 2
               },
-              "kind": "v12.0,user,vcore,serverless",
+              "kind": "v12.0,user,vcore,serverless,freelimit",
               "location": "[parameters('resourceLocation')]",
               "name": "sqlserver-cwksocial/sqldb-cwksocial",
               "type": "Microsoft.Sql/servers/databases",

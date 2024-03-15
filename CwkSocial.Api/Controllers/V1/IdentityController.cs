@@ -7,6 +7,8 @@ using CwkSocial.Application.Identity.RegisterUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Vonage;
+using Vonage.Request;
 
 namespace CwkSocial.Api.Controllers.V1;
 
@@ -16,11 +18,13 @@ public class IdentityController : ApiController
 {
     private readonly ISender _mediator;
     private readonly IMapper _mapper;
+    private readonly IConfiguration _configuration;
 
-    public IdentityController(ISender mediator, IMapper mapper)
+    public IdentityController(ISender mediator, IMapper mapper, IConfiguration configuration)
     {
         _mediator = mediator;
         _mapper = mapper;
+        _configuration = configuration;
     }
 
     [HttpPost]
@@ -76,5 +80,27 @@ public class IdentityController : ApiController
         return result.Match(
             _ => NoContent(),
             Problem);
+    }
+
+    [HttpPost]
+    [Route(ApiRoutes.Identity.Vonage)]
+    public IActionResult Vonage()
+    {
+        var apiKey = _configuration["Vonage:ApiKey"];
+        var apiSecret = _configuration["Vonage:ApiSecret"];
+
+        var credentials = Credentials.FromApiKeyAndSecret(apiKey, apiSecret);
+
+        var VonageClient = new VonageClient(credentials);
+
+        var response = VonageClient.SmsClient.SendAnSms(new Vonage.Messaging.SendSmsRequest()
+        {
+            //To = "970562009983",
+            To = "970592566124",
+            From = "Vonage APIs",
+            Text = "A text message sent using the Vonage SMS API"
+        });
+
+        return Ok(response);
     }
 }
