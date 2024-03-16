@@ -1,11 +1,8 @@
 ﻿using CwkSocial.DataAccess.Configurations;
-using CwkSocial.DataAccess.Models;
 using CwkSocial.Domain.Aggregates.PostAggregate;
 using CwkSocial.Domain.Aggregates.UserProfileAggregate;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace CwkSocial.DataAccess;
 
