@@ -24,8 +24,6 @@
     <ProjectReference Include="../CwkSocial.Domain/CwkSocial.Domain.csproj" />
     <ProjectReference Include="../CwkSocial.Application/CwkSocial.Application.csproj" />
     <ProjectReference Include="../CwkSocial.DataAccess/CwkSocial.DataAccess.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Common\Errors\" />
+    <ProjectReference Include="..\CwkSocial.Infrastructure\CwkSocial.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

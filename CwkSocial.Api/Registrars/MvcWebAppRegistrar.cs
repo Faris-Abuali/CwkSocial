@@ -22,6 +22,8 @@ public class MvcWebAppRegistrar : IWebApplicationRegistrar
 
         app.UseHttpsRedirection();
 
+        app.UseCors("AllowAll"); // Cross-Origin Resource Sharing
+
         app.UseAuthentication();
 
         app.UseAuthorization();

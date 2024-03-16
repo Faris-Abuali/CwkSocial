@@ -1,4 +1,5 @@
-﻿using ErrorOr;
+﻿using CwkSocial.Domain.Enums;
+using ErrorOr;
 using MediatR;
 
 namespace CwkSocial.Application.Identity.RegisterUser;
@@ -15,7 +16,12 @@ public class RegisterUserCommand : IRequest<ErrorOr<string>>
 
     public DateTime DateOfBirth { get; init; }
 
-    public string? Phone { get; init; }
+    public string? PhoneNumber { get; init; }
 
     public string? CurrentCity { get; init; }
+
+    // To help generate the confirmation email
+    public required string ConfirmationLink { get; set; }
+
+    public UserRoles[] Roles { get; init; } = [];
 }

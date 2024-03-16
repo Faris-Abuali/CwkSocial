@@ -1,4 +1,5 @@
 ﻿using CwkSocial.DataAccess;
+using CwkSocial.DataAccess.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +16,7 @@ public class DbRegistrar : IWebApplicationBuilderRegistrar
             options.UseSqlServer(connectionString);
         });
 
-        builder.Services.AddIdentityCore<IdentityUser>(options =>
+        builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
         {
             options.Password.RequireDigit = true;
             options.Password.RequireLowercase = true;
@@ -24,7 +25,9 @@ public class DbRegistrar : IWebApplicationBuilderRegistrar
             //options.Password.RequiredLength = 8;
             options.User.RequireUniqueEmail = true;
         })
-            .AddEntityFrameworkStores<DataContext>();
+            .AddEntityFrameworkStores<DataContext>()
+            .AddDefaultTokenProviders() // Add default token providers including for two-factor authentication
+            .AddSignInManager<SignInManager<ApplicationUser>>();
     }
 }
 

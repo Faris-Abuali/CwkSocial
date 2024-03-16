@@ -11,7 +11,7 @@ public class UpdateUserProfileCommand : IRequest<ErrorOr<UserProfile>>
     public string FirstName { get; init; } = string.Empty;
     public string LastName { get; init; } = string.Empty;
     public string EmailAddress { get; init; } = string.Empty;
-    public string Phone { get; init; } = string.Empty;
+    public string PhoneNumber { get; init; } = string.Empty;
     public DateTime DateOfBirth { get; init; }
     public string CurrentCity { get; init; } = string.Empty;
 }

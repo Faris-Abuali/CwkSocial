@@ -29,7 +29,7 @@ internal class CreateUserProfileCommandHandler : IRequestHandler<CreateUserProfi
                 request.FirstName,
                 request.LastName,
                 request.EmailAddress,
-                request.Phone,
+                request.PhoneNumber,
                 request.DateOfBirth,
                 request.CurrentCity);
 

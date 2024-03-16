@@ -1,8 +1,10 @@
 ﻿using CwkSocial.Application.Models;
 using CwkSocial.Application.Services;
 using CwkSocial.DataAccess;
+using CwkSocial.DataAccess.Models;
 using CwkSocial.Domain.Aggregates.UserProfileAggregate;
 using CwkSocial.Domain.Common.Errors;
+using CwkSocial.Domain.Services;
 using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -17,17 +19,20 @@ internal class RegisterUserCommandHandler
     : IRequestHandler<RegisterUserCommand, ErrorOr<string>>
 {
     private readonly DataContext _context;
-    private readonly UserManager<IdentityUser> _userManager;
+    private readonly UserManager<ApplicationUser> _userManager;
     private readonly IdentityService _identityService;
+    private readonly IEmailService _emailService;
 
     public RegisterUserCommandHandler(
         DataContext context,
-        UserManager<IdentityUser> userManager,
-        IdentityService identityService)
+        UserManager<ApplicationUser> userManager,
+        IdentityService identityService,
+        IEmailService emailService)
     {
         _context = context;
         _userManager = userManager;
         _identityService = identityService;
+        _emailService = emailService;
     }
 
     public async Task<ErrorOr<string>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
@@ -61,7 +66,12 @@ internal class RegisterUserCommandHandler
 
             var userProfile = createUserProfileResult.Value;
 
-            return GetJwtString(identityUser, userProfile);
+            var registerToken = GetJwtString(identityUser, userProfile);
+
+            // --- Email Confirmation ---
+            await _identityService.GenerateAndSendEmailConfirmationToken(request.ConfirmationLink, identityUser);
+
+            return registerToken;
         }
         //catch (UserProfileNotValidException ex)
         //{
@@ -74,6 +84,22 @@ internal class RegisterUserCommandHandler
         }
     }
 
+    private async Task SendEmailConfirmationToken(string url, ApplicationUser identityUser)
+    {
+        var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(identityUser);
+
+        // Encode the token to be used as a query param in the confirmation link
+        var endocedConfirmationToken = WebUtility.UrlEncode(confirmationToken);
+
+        // Add the token as query param to the confirmation link
+        var emailConfirmationUrl = $"{url}&token={endocedConfirmationToken}";
+
+        // Send an email to the user to verify their email address
+        await _emailService.SendEmailConfirmationTokenAsync(
+                           identityUser.Email!,
+                           emailConfirmationUrl);
+    }
+
     private async Task<ErrorOr<bool>> ValidateIdentityUser(RegisterUserCommand request)
     {
         var existingUser = await _userManager.FindByEmailAsync(request.UserName);
@@ -84,21 +110,30 @@ internal class RegisterUserCommandHandler
         return true;
     }
 
-    private async Task<ErrorOr<IdentityUser?>> CreateIdentityUserAsync(
+    private async Task<ErrorOr<ApplicationUser?>> CreateIdentityUserAsync(
         RegisterUserCommand request,
         IDbContextTransaction transaction,
         CancellationToken cancellationToken)
     {
-        var identityUser = new IdentityUser
-        {
-            UserName = request.UserName,
-            Email = request.UserName,
-        };
+        var appUserResult = ApplicationUser.Create(
+            request.UserName,
+            request.UserName,
+            request.FirstName,
+            request.LastName,
+            request.DateOfBirth,
+            request.CurrentCity);
 
-        var createdIdentityUser = await _userManager.CreateAsync(identityUser, request.Password);
+        if (appUserResult.IsError)
+            return appUserResult.Errors;
 
-        //TODO: Add roles to the user
-        //await _userManager.AddToRolesAsync(identityUser, ["X", "F"]);
+        var appUser = appUserResult.Value;
+
+        var createdIdentityUser = await _userManager.CreateAsync(appUser, request.Password);
+
+        // Convert request.Roles to string list
+        var roles = request.Roles.Select(role => role.ToString()).ToList();
+
+        await _userManager.AddToRolesAsync(appUser, roles);
 
         if (!createdIdentityUser.Succeeded)
         {
@@ -109,16 +144,17 @@ internal class RegisterUserCommandHandler
                 .Select(error => ErrorOr.Error.Validation(error.Code, error.Description))
                 .ToList();
 
-            return ErrorOr<IdentityUser?>.From(errors);
+            return errors!;
+            //return ErrorOr<ApplicationUser?>.From(errors);
         }
 
-        return identityUser;
+        return appUser;
     }
 
     private async Task<ErrorOr<UserProfile>> CreateUserProfileAsync(
                RegisterUserCommand request,
                IDbContextTransaction transaction,
-               IdentityUser identityUser,
+               ApplicationUser identityUser,
                CancellationToken cancellationToken)
     {
         try
@@ -128,7 +164,7 @@ internal class RegisterUserCommandHandler
                 request.FirstName,
                 request.LastName,
                 request.UserName,
-                request.Phone,
+                request.PhoneNumber,
                 request.DateOfBirth,
                 request.CurrentCity);
 
@@ -152,7 +188,7 @@ internal class RegisterUserCommandHandler
         }
     }
 
-    private string GetJwtString(IdentityUser identityUser, UserProfile userProfile)
+    private string GetJwtString(ApplicationUser identityUser, UserProfile userProfile)
     {
         var claimsIdentity = new ClaimsIdentity(new[]
               {

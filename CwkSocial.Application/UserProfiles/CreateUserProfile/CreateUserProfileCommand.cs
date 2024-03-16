@@ -12,7 +12,7 @@ public class CreateUserProfileCommand : IRequest<ErrorOr<UserProfile>>
 
     public string EmailAddress { get; init; } = string.Empty;
 
-    public string Phone { get; init; } = string.Empty;
+    public string PhoneNumber { get; init; } = string.Empty;
 
     public DateTime DateOfBirth { get; init; }
 

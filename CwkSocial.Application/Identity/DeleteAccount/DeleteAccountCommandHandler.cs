@@ -24,7 +24,7 @@ internal class DeleteAccountCommandHandler
             .FirstOrDefaultAsync(u => u.Id == request.IdentityUserId.ToString(), cancellationToken);
 
             if (identityUser is null)
-                return Errors.Identity.NonExistentIdentityUser;
+                return Errors.Identity.UserNotFound;
 
             var userProfile = await _context.UserProfiles
                 .FirstOrDefaultAsync(up => up.IdentityId == request.IdentityUserId.ToString(), cancellationToken);
@@ -40,6 +40,13 @@ internal class DeleteAccountCommandHandler
 
             // Delete the identity user
             _context.Users.Remove(identityUser);
+
+            // Delete the roles of the user
+            var roles = await _context.UserRoles
+                .Where(ur => ur.UserId == request.IdentityUserId.ToString())
+                .ToListAsync(cancellationToken);
+
+            _context.UserRoles.RemoveRange(roles);
 
             await _context.SaveChangesAsync(cancellationToken);
 

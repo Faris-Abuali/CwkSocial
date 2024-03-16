@@ -11,8 +11,6 @@
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="MediatR" Version="12.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
-    <PackageReference Include="Twilio" Version="7.0.2" />
-    <PackageReference Include="Vonage" Version="6.16.0" />
   </ItemGroup>
 
   <ItemGroup>

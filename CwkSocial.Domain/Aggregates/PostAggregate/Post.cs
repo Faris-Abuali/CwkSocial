@@ -55,17 +55,6 @@ public class Post
             LastModified = DateTime.UtcNow
         };
 
-        //var validationResult = validator.Validate(post);
-
-        //if (validationResult.IsValid) return post;
-
-        //var exception = new PostNotValidException("Post is not valid")
-        //{
-        //    ValidationErrors = validationResult.Errors.ConvertAll(e => e.ErrorMessage)
-        //};
-
-        //throw exception;
-
         var validationResult = validator.ValidateAndConvertToErrorOr(post);
 
         return validationResult;

@@ -1,7 +1,4 @@
-﻿using AutoMapper;
-using CwkSocial.Application.Enums;
-using CwkSocial.Application.Models;
-using CwkSocial.DataAccess;
+﻿using CwkSocial.DataAccess;
 using CwkSocial.Domain.Aggregates.UserProfileAggregate;
 using CwkSocial.Domain.Common.Errors;
 using ErrorOr;
@@ -35,7 +32,7 @@ internal class UpdateUserProfileCommandHandler
                     request.FirstName,
                     request.LastName,
                     request.EmailAddress,
-                    request.Phone,
+                    request.PhoneNumber,
                     request.DateOfBirth,
                     request.CurrentCity
             );

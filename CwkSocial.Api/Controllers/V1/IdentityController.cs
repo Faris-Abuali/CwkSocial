@@ -2,13 +2,14 @@
 using CwkSocial.Api.Contracts.Identity;
 using CwkSocial.Api.Filters;
 using CwkSocial.Application.Identity.Commands;
+using CwkSocial.Application.Identity.ConfirmEmail;
 using CwkSocial.Application.Identity.DeleteAccount;
 using CwkSocial.Application.Identity.RegisterUser;
+using CwkSocial.Infrastructure.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Vonage;
-using Vonage.Request;
+using System.Net;
 
 namespace CwkSocial.Api.Controllers.V1;
 
@@ -29,10 +30,21 @@ public class IdentityController : ApiController
 
     [HttpPost]
     [Route(ApiRoutes.Identity.Registration)]
-    //[ValidateModel]
+    [ValidateModel]
     public async Task<IActionResult> Register(RegisterUserRequest request)
     {
+        // Construct the confirmation link path
+        var confirmationPath = Url.Action(
+            nameof(ConfirmEmail),
+            "identity",
+            new { email = request.UserName });
+        // The token query string param will be added by the command handler
+
+        var baseUrl = HttpContext.GetRequestBaseUrl();
+
         var command = _mapper.Map<RegisterUserCommand>(request);
+
+        command.ConfirmationLink = $"{baseUrl}{confirmationPath}";
 
         var result = await _mediator.Send(command);
 
@@ -43,14 +55,14 @@ public class IdentityController : ApiController
 
     [HttpPost]
     [Route(ApiRoutes.Identity.Login)]
-    //[ValidateModel]
+    [ValidateModel]
     public async Task<IActionResult> Login(LoginRequest request)
     {
         var command = _mapper.Map<LoginCommand>(request);
 
         var result = await _mediator.Send(command);
 
-      
+
         if (result.IsError) return Problem(result.Errors);
 
         var response = new AuthenticationResponse
@@ -82,25 +94,26 @@ public class IdentityController : ApiController
             Problem);
     }
 
-    [HttpPost]
-    [Route(ApiRoutes.Identity.Vonage)]
-    public IActionResult Vonage()
+    [HttpGet]
+    [Route(ApiRoutes.Identity.ConfirmEmail)]
+    public async Task<IActionResult> ConfirmEmail(
+        [FromQuery] string email,
+        [FromQuery] string token)
     {
-        var apiKey = _configuration["Vonage:ApiKey"];
-        var apiSecret = _configuration["Vonage:ApiSecret"];
+        // Decode the email and token
+        email = WebUtility.HtmlDecode(email);
+        token = WebUtility.HtmlDecode(token);
 
-        var credentials = Credentials.FromApiKeyAndSecret(apiKey, apiSecret);
-
-        var VonageClient = new VonageClient(credentials);
-
-        var response = VonageClient.SmsClient.SendAnSms(new Vonage.Messaging.SendSmsRequest()
+        var command = new ConfirmEmailCommand
         {
-            //To = "970562009983",
-            To = "970592566124",
-            From = "Vonage APIs",
-            Text = "A text message sent using the Vonage SMS API"
-        });
+            Email = email,
+            Token = token,
+        };
 
-        return Ok(response);
+        var result = await _mediator.Send(command);
+
+        return result.Match(
+                _ => Ok(new { message = "Email Confirmed" }),
+                Problem);
     }
 }

@@ -4,6 +4,7 @@ using CwkSocial.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CwkSocial.DataAccess.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240316140938_ExtendIdentityUser")]
+    partial class ExtendIdentityUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,7 +48,7 @@ namespace CwkSocial.DataAccess.Migrations
 
                     b.HasIndex("UserProfileId");
 
-                    b.ToTable("Posts", (string)null);
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("CwkSocial.Domain.Aggregates.PostAggregate.PostComment", b =>
@@ -76,7 +79,7 @@ namespace CwkSocial.DataAccess.Migrations
 
                     b.HasIndex("UserProfileId");
 
-                    b.ToTable("PostComment", (string)null);
+                    b.ToTable("PostComment");
                 });
 
             modelBuilder.Entity("CwkSocial.Domain.Aggregates.PostAggregate.PostReaction", b =>
@@ -105,7 +108,7 @@ namespace CwkSocial.DataAccess.Migrations
                         .IsUnique()
                         .HasFilter("[UserProfileId] IS NOT NULL");
 
-                    b.ToTable("PostReaction", (string)null);
+                    b.ToTable("PostReaction");
                 });
 
             modelBuilder.Entity("CwkSocial.Domain.Aggregates.UserProfileAggregate.UserProfile", b =>
@@ -127,7 +130,7 @@ namespace CwkSocial.DataAccess.Migrations
 
                     b.HasIndex("IdentityId");
 
-                    b.ToTable("UserProfiles", (string)null);
+                    b.ToTable("UserProfiles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -146,7 +149,7 @@ namespace CwkSocial.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -168,7 +171,7 @@ namespace CwkSocial.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RoleClaims", (string)null);
+                    b.ToTable("RoleClaims");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
@@ -225,7 +228,7 @@ namespace CwkSocial.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser");
 
@@ -251,7 +254,7 @@ namespace CwkSocial.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserClaims", (string)null);
+                    b.ToTable("UserClaims");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -272,20 +275,20 @@ namespace CwkSocial.DataAccess.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("UserLogins", (string)null);
+                    b.ToTable("UserLogins");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("RoleId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("UserId", "RoleId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("UserRoles", (string)null);
+                    b.HasKey("RoleId");
+
+                    b.ToTable("UserRoles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -304,7 +307,7 @@ namespace CwkSocial.DataAccess.Migrations
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("UserTokens", (string)null);
+                    b.ToTable("UserTokens");
                 });
 
             modelBuilder.Entity("CwkSocial.DataAccess.Models.ApplicationUser", b =>
@@ -366,7 +369,7 @@ namespace CwkSocial.DataAccess.Migrations
                         .HasForeignKey("IdentityId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.OwnsOne("CwkSocial.Domain.Aggregates.UserProfileAggregate.UserProfile.BasicInfo#CwkSocial.Domain.Aggregates.UserProfileAggregate.BasicInfo", "BasicInfo", b1 =>
+                    b.OwnsOne("CwkSocial.Domain.Aggregates.UserProfileAggregate.BasicInfo", "BasicInfo", b1 =>
                         {
                             b1.Property<Guid>("UserProfileId")
                                 .HasColumnType("uniqueidentifier");
@@ -400,7 +403,7 @@ namespace CwkSocial.DataAccess.Migrations
 
                             b1.HasKey("UserProfileId");
 
-                            b1.ToTable("UserProfiles", (string)null);
+                            b1.ToTable("UserProfiles");
 
                             b1.WithOwner()
                                 .HasForeignKey("UserProfileId");

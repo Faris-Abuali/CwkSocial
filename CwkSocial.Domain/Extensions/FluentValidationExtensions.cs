@@ -20,6 +20,7 @@ public static class FluentValidationExtensions
             errors.Add(Error.Validation(error.PropertyName, error.ErrorMessage));
         }
 
-        return ErrorOr<T>.From(errors);
+        //return ErrorOr<T>.From(errors);
+        return errors;
     }
 }
