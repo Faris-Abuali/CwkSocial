@@ -10,9 +10,4 @@
     <PackageReference Include="ErrorOr" Version="1.10.0" />
     <PackageReference Include="FluentValidation" Version="11.9.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="NewFolder2\" />
-    <Folder Include="NewFolder3\" />
-  </ItemGroup>
 </Project>
